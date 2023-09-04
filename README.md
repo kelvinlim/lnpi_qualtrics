@@ -1,6 +1,6 @@
 # lnpi_qualtrics
 
-Tools for automating qualtrics surveys.so
+Tools for automating qualtrics surveys.
 
 ## Prerequisites for running code
 
