@@ -125,9 +125,9 @@ class LNPIQualtrics:
         return mailingList
             
 
-def main(cmd='all', index=None, verbose=3):
+def main(cmd='all', index=None, verbose=3,env='.env'):
     
-    config = dotenv_values(".env")
+    config = dotenv_values(env)
 
     apiToken = config['APITOKEN']
     dataCenter = config['DATACENTER']
@@ -176,6 +176,8 @@ if __name__ == "__main__":
                       default=0) 
     parser.add_argument("--verbose", type=int, help="verbose level default 3",
                          default=3)   
+    parser.add_argument("--env", type=str, help="name of env file, default .env",
+                         default='.env')  
     args = parser.parse_args()
     
 
@@ -191,7 +193,8 @@ if __name__ == "__main__":
         p = main(        
                     cmd = cmd,
                     index = args.index,
-                    verbose=args.verbose
+                    verbose=args.verbose,
+                    env=args.env
                 )
     else:
         if args.index == 0:
@@ -201,7 +204,8 @@ if __name__ == "__main__":
         p = main(        
                     cmd = cmd,
                     index = args.index,
-                    verbose=args.verbose
+                    verbose=args.verbose,
+                    env=args.env
                 )
         
       
