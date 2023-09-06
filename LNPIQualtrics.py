@@ -13,6 +13,8 @@ from dotenv import dotenv_values
 import argparse
 import pprint
 
+pp = pprint.PrettyPrinter(indent=4)
+
 class LNPIQualtrics:
     
     """
@@ -49,6 +51,8 @@ class LNPIQualtrics:
             mailingLists = ddict['result']['elements']
             return mailingLists
         else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
             return None
         
     
@@ -79,8 +83,9 @@ class LNPIQualtrics:
             contactLookupId = ddict['result']['contactLookupId']
             return contactLookupId
         else:
-            return None
-        
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None        
     
         
     def getContactsMailingList(self,mailingListId,output='json'):
@@ -101,7 +106,12 @@ class LNPIQualtrics:
 
         response = requests.get(baseUrl, headers=headers)
         # print(response.text)
-            
+
+        if response.status_code != 200:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return ModuleNotFoundError
+
         if output == 'raw':
             return response
         elif output == 'json':
@@ -135,7 +145,11 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId)
     mailingLists = qc.getMailingLists()  
-      
+    
+    if mailingLists == None:
+        print(f"Error, no mailingLists found")
+        exit(1)
+
     if cmd == 'all':
         # get the list of mailingLists
         pp = pprint.PrettyPrinter(indent=4)
