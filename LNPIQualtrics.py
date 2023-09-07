@@ -12,6 +12,7 @@ import json
 from dotenv import dotenv_values
 import argparse
 import pprint
+import pandas as pd
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -55,7 +56,44 @@ class LNPIQualtrics:
             pp.pprint(response.content)
             return None
         
-    
+    def getSurveyList(self, format='json'):
+        """
+        get a list of Surveys accessible for this user
+
+        see:  https://api.qualtrics.com/67b9315910902-managing-surveys#list-surveys
+        
+        baseUrl = "https://{0}.qualtrics.com/API/v3/surveys".format(dataCenter)
+        
+        format - output format, default json, others are df for dataframe
+        """
+        
+        baseUrl = "https://{0}.qualtrics.com/API/v3/surveys".format(self.dataCenter)
+
+        headers = {
+            "x-api-token": self.apiToken,
+            }
+
+        response = requests.get(baseUrl, headers=headers)
+        
+        # if OK
+        if response.status_code == 200:
+            # retrieve the CGC
+            # convert to dict
+            ddict = json.loads(response.text)
+            lists = ddict['result']['elements']
+            # convert to a df
+            df = pd.DataFrame(lists)
+ 
+            if format == 'json':
+                output = lists
+            elif format =='df':
+                output = df
+            return output
+        else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None       
+            
     def getContactLookupId(self, mailingListId, contactId):
         """
         gets the ContactLookupId for a specific contactId in a mailingListId
@@ -90,12 +128,7 @@ class LNPIQualtrics:
         
     def getContactsMailingList(self,mailingListId,output='json'):
         
-        """
-        get the Contacts Mailing List
-        
-        for json output, to get the list of the contacts use:
-        result['result']['elements']
-        """
+
         directoryId = self.directoryId   # "POOL_3fAZGWRVfLKuxe3"
 
         baseUrl = "https://{0}.qualtrics.com/API/v3/directories/{1}/mailinglists/{2}/contacts"\
@@ -145,17 +178,18 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId)
     mailingLists = qc.getMailingLists()  
+
+    pp = pprint.PrettyPrinter(indent=4)
     
     if mailingLists == None:
         print(f"Error, no mailingLists found")
         exit(1)
 
-    if cmd == 'all':
+    if cmd == 'list' and index==None:
         # get the list of mailingLists
-        pp = pprint.PrettyPrinter(indent=4)
         for i in range(len(mailingLists)):
             print(f"==============")
-            print(f"List index: {i+1}") 
+            print(f"List index: {i+1}  {mailingLists[i]['name']}") 
             print(f"==============")
             pp.pprint(mailingLists[i])
     elif cmd == 'list':
@@ -166,12 +200,23 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
         updatedMailingList = qc.addContactLookupIdToList(mailingListId, mailingList)
         
         # print out the contents
-        pp = pprint.PrettyPrinter(indent=4)
+        #pp = pprint.PrettyPrinter(indent=4)
         for i in range(len(updatedMailingList)):
             print(f"==============")
-            print(f"Subject index: {i+1}") 
+            print(f"Subject index: {i+1} {mailingLists[i]['name']} {updatedMailingList[i]['email']}") 
             print(f"==============")
             pp.pprint(updatedMailingList[i])
+    elif cmd == 'surveys':
+        # retrieve surveys accessible by the user
+        surveyLists = qc.getSurveyList()
+        
+        # print out the contents
+        #pp = pprint.PrettyPrinter(indent=4)
+        for i in range(len(surveyLists)):
+            print(f"==============")
+            print(f"Study index: {i+1} {surveyLists[i]['name']}") 
+            print(f"==============")
+            pp.pprint(surveyLists[i])
     pass
 
 
@@ -187,11 +232,13 @@ if __name__ == "__main__":
  
     parser.add_argument("--index", type = int,
                      help="index number of mailingList to print",
-                      default=0) 
+                      default=None) 
     parser.add_argument("--verbose", type=int, help="verbose level default 3",
                          default=3)   
     parser.add_argument("--env", type=str, help="name of env file, default .env",
                          default='.env')  
+    parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default all",
+                         default='all')  
     args = parser.parse_args()
     
 
@@ -204,6 +251,7 @@ if __name__ == "__main__":
             cmd = 'all'
         else:
             cmd = 'list'
+        cmd = 'surveys'
         p = main(        
                     cmd = cmd,
                     index = args.index,
@@ -211,12 +259,9 @@ if __name__ == "__main__":
                     env=args.env
                 )
     else:
-        if args.index == 0:
-            cmd = 'all'
-        else:
-            cmd = 'list'
+
         p = main(        
-                    cmd = cmd,
+                    cmd = args.cmd,
                     index = args.index,
                     verbose=args.verbose,
                     env=args.env
