@@ -203,7 +203,7 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
         #pp = pprint.PrettyPrinter(indent=4)
         for i in range(len(updatedMailingList)):
             print(f"==============")
-            print(f"Subject index: {i+1} {mailingLists[i]['name']} {updatedMailingList[i]['email']}") 
+            print(f"Subject index: {i+1} {mailingLists[index-1]['name']} {updatedMailingList[i]['email']}") 
             print(f"==============")
             pp.pprint(updatedMailingList[i])
     elif cmd == 'surveys':
