@@ -224,7 +224,7 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="""
-        Get information about MailingLists. Account information is
+        Get information about MailingLists and Surveys. Account information is
         read from a .env file which contains the APITOKEN, DATACENTER and DIRECTORYID.
         Without any arguments, the mailingLists are listed with the index. When the index argumennt
         is provided, then contact details for that mailingList are printed."""
@@ -237,8 +237,8 @@ if __name__ == "__main__":
                          default=3)   
     parser.add_argument("--env", type=str, help="name of env file, default .env",
                          default='.env')  
-    parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default all",
-                         default='all')  
+    parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
+                         default='list')  
     args = parser.parse_args()
     
 
