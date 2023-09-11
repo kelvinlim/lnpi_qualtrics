@@ -235,7 +235,7 @@ if __name__ == "__main__":
                       default=None) 
     parser.add_argument("--verbose", type=int, help="verbose level default 3",
                          default=3)   
-    parser.add_argument("--env", type=str, help="name of env file, default .env",
+    parser.add_argument("--config", type=str, help="name of env file, default .env",
                          default='.env')  
     parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
                          default='list')  
@@ -246,17 +246,14 @@ if __name__ == "__main__":
 
     if test:
         print("Warning: running in test mode")
-        args.index=1
-        if args.index == 0:
-            cmd = 'all'
-        else:
-            cmd = 'list'
-        cmd = 'surveys'
+
+        cmd = args.cmd
+        
         p = main(        
                     cmd = cmd,
                     index = args.index,
                     verbose=args.verbose,
-                    env=args.env
+                    env='.env_va', #args.config
                 )
     else:
 
@@ -264,7 +261,7 @@ if __name__ == "__main__":
                     cmd = args.cmd,
                     index = args.index,
                     verbose=args.verbose,
-                    env=args.env
+                    env=args.config
                 )
         
       
