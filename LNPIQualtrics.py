@@ -16,6 +16,7 @@ import pandas as pd
 import time
 import zipfile
 import io
+from datetime import datetime
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -58,7 +59,40 @@ class LNPIQualtrics:
             print(f"Error: {response.status_code}")
             pp.pprint(response.content)
             return None
+
+    def getSurveyInformation(self, surveyId):
+        """
+        get the survey design, provides important information about the questions and 
+        design of the survey which aid in its interpretation.
+
+        see: https://api.qualtrics.com/67b9315910902-managing-surveys
         
+        baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}".format(dataCenter, surveyId)
+        
+        baseUrl = "https://{0}.qualtrics.com/API/v3/surveys".format(dataCenter)
+        
+        format - output format, default json, others are df for dataframe
+        """
+        
+        baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}".format(self.dataCenter, surveyId)
+        headers = {
+            "x-api-token": self.apiToken,
+            }
+
+        response = requests.get(baseUrl, headers=headers)
+        
+        # if OK
+        if response.status_code == 200:
+            # retrieve the CGC
+            # convert to dict
+            ddict = json.loads(response.text)
+            surveyInfo = ddict['result']
+            return surveyInfo
+        else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None    
+                
     def getSurveyList(self, format='json'):
         """
         get a list of Surveys accessible for this user
@@ -186,6 +220,8 @@ class LNPIQualtrics:
             data = self.exportResponsesFile(surveyId, fileId=fileId)
             pass
         
+
+        
     """
     get responses
     1. request the responses
@@ -310,6 +346,9 @@ class LNPIQualtrics:
         """ 
         export the file
         """
+        
+        surveyInfo = self.getSurveyInformation(surveyId)
+        
         if fileId == None:
             fileId = self.fileId
             
@@ -322,7 +361,32 @@ class LNPIQualtrics:
         # if OK
         if response.status_code == 200:
             # file is in response.content
-            zipfile.ZipFile(io.BytesIO(response.content)).extractall('.')
+            zf = zipfile.ZipFile(io.BytesIO(response.content))
+            # assume only one file
+            origFileName = zf.filelist[0].filename
+            # create a datetime string for the filename
+            dt = datetime.now()
+            str_date_time = dt.strftime("%Y%m%d_%H%M")
+            
+            # replace the spaces with _
+            newFileName = origFileName.replace(" ","_")
+            # replace .json with datetime.json
+            newFileName = newFileName.replace(".json", f"_{str_date_time}.json")
+
+            # extract the file
+            # open the file and read the contents 
+            with zf.open(origFileName) as myFile:
+                fileContents = myFile.read()
+            # read json into a dict
+            ddict = json.loads(fileContents)
+            # add the surveyInfo
+            ddict['surveyInfo'] = surveyInfo
+            ddict['extractionDateTime'] = str(dt)
+            # output json with indents
+            with open(newFileName, mode='w') as newFile:
+                json.dump(ddict, newFile, indent=4)
+            pass
+            #zipfile.ZipFile(io.BytesIO(response.content)).extractall('.')
         else:
             print(f"Error: {response.status_code}")
             pp.pprint(response.content)
@@ -414,7 +478,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
 
-    test = False
+    test = True
 
     if test:
         print("Warning: running in test mode")
