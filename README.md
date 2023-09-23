@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 ```
 
-## Command for querying mailingLists
+## Command for querying mailing Lists
 
 This tool is for querying the mailingLists associated with your account.  First complete the .env file which contains information on your account needed for querying. This can be located on the qualtrics site by selecting the circle in the top right corner and then Account Settings followed by QualtricsIDs tab. You will the API Token, the Datacenter ID and the Default Directory which will go into then entries APITOKEN, DATACENTER and DIRECTORYID respectively.
 
@@ -41,4 +41,20 @@ To get detailed information about each subject in the mailing list (e.g., contac
 
 ```
 ./LNPIQualtrics.py --index 1
+```
+
+## Extract Response Data
+
+First get the list of your surveys.
+
+```
+./LNPIQualtrics.py --cmd surveys
+```
+
+From the output, find the Survey index for the for the Survey you want to extract.
+
+Now provide the index in the command.  This will extract all the data into a json file with the name of  the survey and a datetime stamp.  This will be placed in your current directory.
+
+```
+./LNPIQualtrics.py --cmd surveys --index 1
 ```
