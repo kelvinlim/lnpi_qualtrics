@@ -461,17 +461,23 @@ if __name__ == "__main__":
         description="""
         Get information about MailingLists and Surveys. Account information is
         read from a .env file which contains the APITOKEN, DATACENTER and DIRECTORYID.
-        Without any arguments, the mailingLists are listed with the index. When the index argumennt
-        is provided, then contact details for that mailingList are printed."""
+        Without any arguments, the mailingLists are listed with the index. 
+        When the index argumennt is provided, then contact details for that mailingList are printed.
+        
+        To extract the survey data, first use the --cmd surveys to get the index for the survey you 
+        want to extract.  Then add the --index number  argument where number is the index of your
+        survey that you want to extract.
+        """
     )
  
+    parser.add_argument("--env", type = str,
+                     help="name of env file in the current directory, default .env",
+                      default=".env") 
     parser.add_argument("--index", type = int,
                      help="index number of mailingList to print",
                       default=None) 
     parser.add_argument("--verbose", type=int, help="verbose level default 3",
                          default=3)   
-    parser.add_argument("--config", type=str, help="name of env file, default .env",
-                         default='.env')  
     parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
                          default='list')  
     parser.add_argument('--test', dest='feature', default=False, action='store_true')
@@ -490,7 +496,7 @@ if __name__ == "__main__":
                     cmd = cmd,
                     index = index,
                     verbose=args.verbose,
-                    env='.env', #args.config
+                    env=args.env,
                 )
     else:
 
@@ -498,7 +504,7 @@ if __name__ == "__main__":
                     cmd = args.cmd,
                     index = args.index,
                     verbose=args.verbose,
-                    env=args.config
+                    env=args.env
                 )
         
       
