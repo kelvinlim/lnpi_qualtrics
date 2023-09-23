@@ -478,7 +478,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
 
-    test = True
+    test = False
 
     if test:
         print("Warning: running in test mode")
