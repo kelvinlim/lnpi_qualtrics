@@ -13,6 +13,9 @@ from dotenv import dotenv_values
 import argparse
 import pprint
 import pandas as pd
+import time
+import zipfile
+import io
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -68,6 +71,7 @@ class LNPIQualtrics:
         """
         
         baseUrl = "https://{0}.qualtrics.com/API/v3/surveys".format(self.dataCenter)
+        baseUrl = f"https://{self.dataCenter}.qualtrics.com/API/v3/surveys"
 
         headers = {
             "x-api-token": self.apiToken,
@@ -84,6 +88,7 @@ class LNPIQualtrics:
             # convert to a df
             df = pd.DataFrame(lists)
  
+            self.surveyLists = lists
             if format == 'json':
                 output = lists
             elif format =='df':
@@ -166,7 +171,163 @@ class LNPIQualtrics:
             mailingList[index]['contactLookupId'] = contactLookupId
             pass
         return mailingList
+       
+       
+    def getResponses(self, surveyId):
+        """
+        get the responses
+        """
+        # start response request
+        progressId = self.exportResponsesStart(surveyId)
+        # poll the request
+        fileId = self.exportResponsesProgress(surveyId, progressId)
+        if fileId != None:
+            # get the file
+            data = self.exportResponsesFile(surveyId, fileId=fileId)
+            pass
+        
+    """
+    get responses
+    1. request the responses
+        iad1.qualtrics.com/API/v3/surveys/SV_bwrylOA5nNnI9M1/export-responses
+        https://api.qualtrics.com/6b00592b9c013-start-response-export
+        
+        https://yul1.qualtrics.com/API/v3/surveys/{surveyId}/export-responses
+        
+        body  {
+            "format": "json"  # or csv
+            "timeZone": "America/Chicago"
+            } 
             
+            
+        {
+            "result": {
+                "progressId": "ES_0d2n60qVHB9jSLz",
+                "percentComplete": 0.0,
+                "status": "inProgress"
+            },
+            "meta": {
+                "requestId": "7a9150e0-08bb-4953-89cf-ef8a157b8aa7",
+                "httpStatus": "200 - OK"
+            }
+        }     
+    """
+    def exportResponsesStart(self, surveyId, format='json'):
+        
+        baseUrl = f"https://{self.dataCenter}.qualtrics.com/API/v3/surveys/{surveyId}/export-responses"
+        headers = {
+            "x-api-token": self.apiToken,
+        }
+        
+        data = {
+            "format": format
+        }
+        response = requests.request("POST", baseUrl, json=data, headers=headers)
+        
+        # if OK
+        if response.status_code == 200:
+            # convert to dict
+            ddict = json.loads(response.text)
+            # get the progressId for next step
+            self.progressId = ddict['result']['progressId']
+            return self.progressId
+        else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None
+        
+    """
+    2. Poll for progress on the export using the Get Response Export Progress
+        'iad1.qualtrics.com/API/v3/surveys/SV_bwrylOA5nNnI9M1/export-responses/ES_0d2n60qVHB9jSLz'
+        https://api.qualtrics.com/37e6a66f74ab4-get-response-export-progress
+        
+        https://yul1.qualtrics.com/API/v3/surveys/{surveyId}/export-responses/{exportProgressId}
+    
+        Need the fileId
+        {
+            "result": {
+                "fileId": "1dc4c492-fbb6-4713-a7ba-bae9b988a965-def",
+                "percentComplete": 100.0,
+                "status": "complete"
+            },
+            "meta": {
+                "requestId": "a5a2db6c-3fab-4363-92dc-debddcc51e40",
+                "httpStatus": "200 - OK"
+            }
+        }
+    """    
+    def exportResponsesProgress(self, surveyId, progressId=None):
+        """
+        Poll export process until completed and have a fileId
+        """
+        
+        # set fileId to None
+        fileId = None
+        
+        if progressId == None:
+            # set
+            progressId = self.progressId
+        
+        baseUrl = f"https://{self.dataCenter}.qualtrics.com/API/v3/surveys/{surveyId}/export-responses/{progressId}"
+        
+        headers = {
+            "x-api-token": self.apiToken,
+        }
+        
+        count = 0
+        # wait for 20 sec or fileId
+        while fileId == None and count < 20:
+            response = requests.get(baseUrl, headers=headers)
+        
+            # if OK
+            if response.status_code == 200:
+                # convert to dict
+                ddict = json.loads(response.text)
+                # check if there is fileId, means that export is completed
+                if "fileId" in ddict['result'].keys():
+                    fileId = ddict['result']['fileId']
+            
+            time.sleep(2)
+            count += 2   # increment the counter
+            
+        if fileId != None:
+            self.fileId = fileId
+            return self.fileId
+        else:
+            print(f"Error: No fileId after {count} seconds")
+            pp.pprint(response.content)
+            return None
+            
+    """    
+    3. When progress is complete, get the file  Get Response Export File
+        https://api.qualtrics.com/41296b6f2e828-get-response-export-file
+        
+        https://yul1.qualtrics.com/API/v3/surveys/{surveyId}/export-responses/{fileId}/file
+        
+    """
+    
+    def exportResponsesFile(self, surveyId, fileId=None):
+        """ 
+        export the file
+        """
+        if fileId == None:
+            fileId = self.fileId
+            
+        baseUrl = f"https://{self.dataCenter}.qualtrics.com/API/v3/surveys/{surveyId}/export-responses/{fileId}/file"
+        
+        headers = {
+            "x-api-token": self.apiToken,
+        }
+        response = requests.get(baseUrl, headers=headers)
+        # if OK
+        if response.status_code == 200:
+            # file is in response.content
+            zipfile.ZipFile(io.BytesIO(response.content)).extractall('.')
+        else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None     
+    
 
 def main(cmd='all', index=None, verbose=3,env='.env'):
     
@@ -206,7 +367,7 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
             print(f"Subject index: {i+1} {mailingLists[index-1]['name']} {updatedMailingList[i]['email']}") 
             print(f"==============")
             pp.pprint(updatedMailingList[i])
-    elif cmd == 'surveys':
+    elif cmd == 'surveys' and index==None:
         # retrieve surveys accessible by the user
         surveyLists = qc.getSurveyList()
         
@@ -214,9 +375,19 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
         #pp = pprint.PrettyPrinter(indent=4)
         for i in range(len(surveyLists)):
             print(f"==============")
-            print(f"Study index: {i+1} {surveyLists[i]['name']}") 
+            print(f"Survey index: {i+1} {surveyLists[i]['name']}") 
             print(f"==============")
             pp.pprint(surveyLists[i])
+    elif cmd == 'surveys':
+        # retrieve surveys accessible by the user
+        surveyLists = qc.getSurveyList()
+        
+        # get the surveyId for the index
+        surveyId = surveyLists[index-1]['id']
+
+        # get the responses
+        qc.getResponses(surveyId)
+
     pass
 
 
@@ -239,6 +410,7 @@ if __name__ == "__main__":
                          default='.env')  
     parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
                          default='list')  
+    parser.add_argument('--test', dest='feature', default=False, action='store_true')
     args = parser.parse_args()
     
 
@@ -248,12 +420,13 @@ if __name__ == "__main__":
         print("Warning: running in test mode")
 
         cmd = args.cmd
-        
+        cmd = 'surveys'
+        index = 14
         p = main(        
                     cmd = cmd,
-                    index = args.index,
+                    index = index,
                     verbose=args.verbose,
-                    env='.env_va', #args.config
+                    env='.env', #args.config
                 )
     else:
 
