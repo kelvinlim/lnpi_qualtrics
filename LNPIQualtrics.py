@@ -27,12 +27,13 @@ class LNPIQualtrics:
     
     """
     
-    def __init__(self, apiToken, dataCenter,directoryId):
+    def __init__(self, apiToken, dataCenter,directoryId, verify=True):
         
         self.apiToken = apiToken
         self.dataCenter = dataCenter
         self.directoryId = directoryId
-        
+        self.verify = verify
+
     def getMailingLists(self):
         """
         get a list of MailingList
@@ -46,7 +47,7 @@ class LNPIQualtrics:
             "x-api-token": self.apiToken,
             }
 
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
         
         # if OK
         if response.status_code == 200:
@@ -79,7 +80,7 @@ class LNPIQualtrics:
             "x-api-token": self.apiToken,
             }
 
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers,verify=self.verify)
         
         # if OK
         if response.status_code == 200:
@@ -111,7 +112,7 @@ class LNPIQualtrics:
             "x-api-token": self.apiToken,
             }
 
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
         
         # if OK
         if response.status_code == 200:
@@ -150,7 +151,7 @@ class LNPIQualtrics:
             "x-api-token": self.apiToken,
             }
 
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
         
         # if OK
         if response.status_code == 200:
@@ -176,7 +177,7 @@ class LNPIQualtrics:
             "x-api-token": self.apiToken,
             }
 
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
         # print(response.text)
 
         if response.status_code != 200:
@@ -258,7 +259,7 @@ class LNPIQualtrics:
         data = {
             "format": format
         }
-        response = requests.request("POST", baseUrl, json=data, headers=headers)
+        response = requests.request("POST", baseUrl, json=data, headers=headers,verify=self.verify)
         
         # if OK
         if response.status_code == 200:
@@ -313,7 +314,7 @@ class LNPIQualtrics:
         count = 0
         # wait for 20 sec or fileId
         while fileId == None and count < 20:
-            response = requests.get(baseUrl, headers=headers)
+            response = requests.get(baseUrl, headers=headers, verify=self.verify)
         
             # if OK
             if response.status_code == 200:
@@ -357,7 +358,7 @@ class LNPIQualtrics:
         headers = {
             "x-api-token": self.apiToken,
         }
-        response = requests.get(baseUrl, headers=headers)
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
         # if OK
         if response.status_code == 200:
             # file is in response.content
@@ -400,8 +401,15 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
     apiToken = config['APITOKEN']
     dataCenter = config['DATACENTER']
     directoryId = config['DIRECTORYID']
+    if "VERIFY" in config.keys():
+        if config['VERIFY'] == 'True':
+            verify=True
+        elif config['VERIFY'] == 'False':
+            verify = False
+    else:
+        verify = True
     
-    qc = LNPIQualtrics(apiToken, dataCenter,directoryId)
+    qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify)
     mailingLists = qc.getMailingLists()  
 
     pp = pprint.PrettyPrinter(indent=4)
@@ -481,6 +489,7 @@ if __name__ == "__main__":
     parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
                          default='list')  
     parser.add_argument('--test', dest='feature', default=False, action='store_true')
+
     args = parser.parse_args()
     
 

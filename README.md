@@ -25,10 +25,13 @@ This tool is for querying the mailingLists associated with your account.  First 
 
 .env
 
+example file for va
 ```
 APITOKEN=FAKEIe58WHnDjwvB0zk0vabc13gas635dd
-DATACENTER=ca1
+DATACENTER=gov1
 DIRECTORYID=POOL_3fAZGWRVfLKuxe3
+# For VA, set VERIFY=False
+VERIFY=False
 ```
 
 To get the list of your mailingLists, run the following command. Note the List index number before each entry. This will be used in the next step.
