@@ -16,6 +16,7 @@ import pandas as pd
 import time
 import zipfile
 import io
+import os
 from datetime import datetime
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -208,12 +209,15 @@ class LNPIQualtrics:
         return mailingList
        
        
-    def getResponses(self, surveyId):
+    def getResponses(self, surveyId, format='json'):
         """
         get the responses
         """
+        
+        self.format = format
+        
         # start response request
-        progressId = self.exportResponsesStart(surveyId)
+        progressId = self.exportResponsesStart(surveyId, format=self.format)
         # poll the request
         fileId = self.exportResponsesProgress(surveyId, progressId)
         if fileId != None:
@@ -365,36 +369,44 @@ class LNPIQualtrics:
             zf = zipfile.ZipFile(io.BytesIO(response.content))
             # assume only one file
             origFileName = zf.filelist[0].filename
+            
+            # get the filetype from the file suffix
+            format = os.path.splitext(origFileName)[1]  # returns .json or .csv
             # create a datetime string for the filename
             dt = datetime.now()
             str_date_time = dt.strftime("%Y%m%d_%H%M")
             
             # replace the spaces with _
             newFileName = origFileName.replace(" ","_")
-            # replace .json with datetime.json
-            newFileName = newFileName.replace(".json", f"_{str_date_time}.json")
+            # replace {format} with datetime{format}
+            newFileName = newFileName.replace(f"{format}", f"_{str_date_time}{format}")
 
             # extract the file
             # open the file and read the contents 
             with zf.open(origFileName) as myFile:
                 fileContents = myFile.read()
-            # read json into a dict
-            ddict = json.loads(fileContents)
-            # add the surveyInfo
-            ddict['surveyInfo'] = surveyInfo
-            ddict['extractionDateTime'] = str(dt)
-            # output json with indents
-            with open(newFileName, mode='w') as newFile:
-                json.dump(ddict, newFile, indent=4)
-            pass
-            #zipfile.ZipFile(io.BytesIO(response.content)).extractall('.')
+                
+            if format=='.json':
+                # read json into a dict
+                ddict = json.loads(fileContents)
+                # add the surveyInfo
+                ddict['surveyInfo'] = surveyInfo
+                ddict['extractionDateTime'] = str(dt)
+                # output json with indents
+                with open(newFileName, mode='w') as newFile:
+                    json.dump(ddict, newFile, indent=4)
+                pass
+                #zipfile.ZipFile(io.BytesIO(response.content)).extractall('.')
+            elif format=='.csv':
+                with open(newFileName, mode='wb') as newfile:
+                    newfile.write(fileContents)
         else:
             print(f"Error: {response.status_code}")
             pp.pprint(response.content)
             return None     
     
 
-def main(cmd='all', index=None, verbose=3,env='.env'):
+def main(cmd='all', index=None, verbose=3,env='.env', format='json'):
     
     config = dotenv_values(env)
 
@@ -458,7 +470,7 @@ def main(cmd='all', index=None, verbose=3,env='.env'):
         surveyId = surveyLists[index-1]['id']
 
         # get the responses
-        qc.getResponses(surveyId)
+        qc.getResponses(surveyId, format=format)
 
     pass
 
@@ -488,12 +500,14 @@ if __name__ == "__main__":
                          default=3)   
     parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
                          default='list')  
+    parser.add_argument("--format", type=str, help="output format, [json,csv], default json",
+                         default='json')  
     parser.add_argument('--test', dest='feature', default=False, action='store_true')
 
     args = parser.parse_args()
     
 
-    test = False
+    test = True
 
     if test:
         print("Warning: running in test mode")
@@ -506,6 +520,7 @@ if __name__ == "__main__":
                     index = index,
                     verbose=args.verbose,
                     env=args.env,
+                    format = 'csv', #args.format, 
                 )
     else:
 
@@ -513,7 +528,9 @@ if __name__ == "__main__":
                     cmd = args.cmd,
                     index = args.index,
                     verbose=args.verbose,
-                    env=args.env
+                    env=args.env,
+                    format = args.format, 
+
                 )
         
       
