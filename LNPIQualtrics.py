@@ -18,6 +18,7 @@ import zipfile
 import io
 import os
 from datetime import datetime
+from decoders import *
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -28,12 +29,15 @@ class LNPIQualtrics:
     
     """
     
-    def __init__(self, apiToken, dataCenter,directoryId, verify=True):
+    def __init__(self, apiToken, dataCenter,directoryId,
+                 verify=True,nodecode=False,rawdata=False):
         
         self.apiToken = apiToken
         self.dataCenter = dataCenter
         self.directoryId = directoryId
         self.verify = verify
+        self.nodecode=nodecode
+        self.rawdata=rawdata
 
     def getMailingLists(self):
         """
@@ -389,6 +393,9 @@ class LNPIQualtrics:
             if format=='.json':
                 # read json into a dict
                 ddict = json.loads(fileContents)
+                if self.nodecode == False:
+                    ddict = self.decodeData(ddict)
+                    ddict = self.relabelData(ddict, surveyInfo)
                 # add the surveyInfo
                 ddict['surveyInfo'] = surveyInfo
                 ddict['extractionDateTime'] = str(dt)
@@ -405,8 +412,77 @@ class LNPIQualtrics:
             pp.pprint(response.content)
             return None     
     
+    def relabelData(self, ddict, surveyInfo):
+        """
+        Relabel the data using the questionName from surveyInfo
+        
+        surveyInfo['questions']['QID40']['questionName']
 
-def main(cmd='all', index=None, verbose=3,env='.env', format='json'):
+        Args:
+            ddict (list of dicts): survey data from qualtrics 
+        """
+        newdict = {"responses": []}
+        
+        for response in ddict['responses']:
+            # make a copy of original since we are changing the keys!
+            origResponseValuesKeys = list(response['values'].keys())
+            for dataKey in origResponseValuesKeys:
+                
+                if dataKey in surveyInfo['questions'].keys():
+                    # get the newLabel
+                    newLabel = surveyInfo['questions'][dataKey]['questionName']
+                    # relabel
+                    response['values'][newLabel] = response['values'].pop(dataKey)
+                pass
+        
+            newdict['responses'].append(response)
+             
+        return newdict
+        
+    def decodeData(self, ddict, remove=True):
+        """
+        Decode task data using modules in decoders
+        
+        ddict  - the dictionary containing the json data from the task
+        remove - flag to remove the original column from the response
+        """
+        
+        def get_module_names(package_name='decoders'):
+            import pkgutil
+            package = __import__(package_name)
+            module_names = [name for _, name, _ in pkgutil.walk_packages(package.__path__)]
+
+            for module_name in module_names:
+                print(module_name)
+            return module_names
+        
+        tasks = get_module_names()
+        
+        newdict = {"responses": []}
+        
+        for response in ddict['responses']:
+            
+            for task in tasks:
+                # check if task is here
+                if task in response['values'].keys():
+                    # get the json string and convert into a dict
+                    taskData = json.loads(response['values'][task]) 
+                    
+                    # call the method for this data
+                    result = eval(f"{task}.decode(taskData)")
+                    # append result
+                    response['values'].update(result)
+
+                    # remove original data
+                    if remove:
+                        response['values'].pop(task)                    
+            newdict['responses'].append(response)
+            pass
+        
+        return newdict
+
+def main(cmd='all', index=None, verbose=3,env='.env', format='json',
+        nodecode = False, rawdata=False):
     
     config = dotenv_values(env)
 
@@ -421,7 +497,8 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json'):
     else:
         verify = True
     
-    qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify)
+    qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
+                       nodecode=nodecode, rawdata=rawdata)
     mailingLists = qc.getMailingLists()  
 
     pp = pprint.PrettyPrinter(indent=4)
@@ -503,7 +580,8 @@ if __name__ == "__main__":
     parser.add_argument("--format", type=str, help="output format, [json,csv], default json",
                          default='json')  
     parser.add_argument('--test', dest='feature', default=False, action='store_true')
-
+    parser.add_argument('--nodecode', help="do not decode taskdata", action='store_true')
+    parser.add_argument('--rawdata', help="dump raw data", action='store_true')
     args = parser.parse_args()
     
 
@@ -520,7 +598,9 @@ if __name__ == "__main__":
                     index = index,
                     verbose=args.verbose,
                     env=args.env,
-                    format = 'csv', #args.format, 
+                    format = 'json', #args.format, 
+                    nodecode = args.nodecode,
+                    rawdata = args.rawdata,                
                 )
     else:
 
@@ -530,6 +610,8 @@ if __name__ == "__main__":
                     verbose=args.verbose,
                     env=args.env,
                     format = args.format, 
+                    nodecode = args.nodecode,
+                    rawdata = args.rawdata,
 
                 )
         
