@@ -30,7 +30,8 @@ class LNPIQualtrics:
     """
     
     def __init__(self, apiToken, dataCenter,directoryId,
-                 verify=True,nodecode=False,rawdata=False):
+                 verify=True,nodecode=False,rawdata=False,
+                 dataframe = False):
         
         self.apiToken = apiToken
         self.dataCenter = dataCenter
@@ -38,6 +39,7 @@ class LNPIQualtrics:
         self.verify = verify
         self.nodecode=nodecode
         self.rawdata=rawdata
+        self.dataframe = dataframe
 
     def getMailingLists(self):
         """
@@ -389,6 +391,10 @@ class LNPIQualtrics:
             # open the file and read the contents 
             with zf.open(origFileName) as myFile:
                 fileContents = myFile.read()
+            
+            if self.rawdata:
+                self.nodecode = True  # don't decode data
+                format = '.json'
                 
             if format=='.json':
                 # read json into a dict
@@ -396,9 +402,19 @@ class LNPIQualtrics:
                 if self.nodecode == False:
                     ddict = self.decodeData(ddict)
                     ddict = self.relabelData(ddict, surveyInfo)
+                    # convert a list with single item to a number
+                    ddict = self.delistValues(ddict)
                 # add the surveyInfo
                 ddict['surveyInfo'] = surveyInfo
                 ddict['extractionDateTime'] = str(dt)
+                
+                if self.dataframe:
+                    # output the 'values' as a csv using a dataframe
+                    df = self.createDataFrame(ddict)
+                    # change the name of the file
+                    dfFileName = newFileName.replace(".json","_df.csv")
+                    df.to_csv(dfFileName)
+                    
                 # output json with indents
                 with open(newFileName, mode='w') as newFile:
                     json.dump(ddict, newFile, indent=4)
@@ -411,6 +427,18 @@ class LNPIQualtrics:
             print(f"Error: {response.status_code}")
             pp.pprint(response.content)
             return None     
+
+    def createDataFrame(self, ddict):
+        """
+        Create a dataframe from the values in each response
+        
+        """    
+        rows = []  # hold list of dict
+        for response in ddict['responses']:
+            rows.append(response['values'])
+                        
+        df = pd.DataFrame.from_dict(rows)             
+        return df
     
     def relabelData(self, ddict, surveyInfo):
         """
@@ -438,6 +466,35 @@ class LNPIQualtrics:
             newdict['responses'].append(response)
              
         return newdict
+    
+    def delistValues(self, ddict):
+        """
+        converts list to a single numeric value
+        
+          "QN06_activity": [
+                    "5"
+                ],
+
+        Args:
+            ddict (list of dicts): survey data from qualtrics 
+        """
+        newdict = {"responses": []}
+        
+        for response in ddict['responses']:
+
+            for key in response['values'].keys():
+                # check if value is a list
+                if type(response['values'][key]) is list:
+                    if len(response['values'][key]) == 1:
+                        # convert the first element of the list to a number
+                        response['values'][key] = float(response['values'][key][0])
+                        pass
+                    else:
+                        response['values'][key] = None
+                        
+            newdict['responses'].append(response)
+             
+        return newdict
         
     def decodeData(self, ddict, remove=True):
         """
@@ -453,7 +510,8 @@ class LNPIQualtrics:
             module_names = [name for _, name, _ in pkgutil.walk_packages(package.__path__)]
 
             for module_name in module_names:
-                print(module_name)
+                #print(module_name)
+                pass
             return module_names
         
         tasks = get_module_names()
@@ -482,7 +540,8 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False):
+        nodecode = False, rawdata=False, dataframe = False,                
+):
     
     config = dotenv_values(env)
 
@@ -498,7 +557,9 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
         verify = True
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
-                       nodecode=nodecode, rawdata=rawdata)
+                       nodecode=nodecode, rawdata=rawdata, 
+                       dataframe=dataframe )
+    
     mailingLists = qc.getMailingLists()  
 
     pp = pprint.PrettyPrinter(indent=4)
@@ -579,9 +640,10 @@ if __name__ == "__main__":
                          default='list')  
     parser.add_argument("--format", type=str, help="output format, [json,csv], default json",
                          default='json')  
-    parser.add_argument('--test', dest='feature', default=False, action='store_true')
+    #parser.add_argument('--test', dest='feature', default=False, action='store_true')
     parser.add_argument('--nodecode', help="do not decode taskdata", action='store_true')
     parser.add_argument('--rawdata', help="dump raw data", action='store_true')
+    parser.add_argument('--dataframe', help="create csv dataframe", action='store_true')
     args = parser.parse_args()
     
 
@@ -592,7 +654,7 @@ if __name__ == "__main__":
 
         cmd = args.cmd
         cmd = 'surveys'
-        index = 14
+        index = 16
         p = main(        
                     cmd = cmd,
                     index = index,
@@ -600,7 +662,8 @@ if __name__ == "__main__":
                     env=args.env,
                     format = 'json', #args.format, 
                     nodecode = args.nodecode,
-                    rawdata = args.rawdata,                
+                    rawdata = args.rawdata,
+                    dataframe = True, #args.dataframe,                
                 )
     else:
 
@@ -612,6 +675,7 @@ if __name__ == "__main__":
                     format = args.format, 
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
+                    dataframe = args.dataframe,                
 
                 )
         
