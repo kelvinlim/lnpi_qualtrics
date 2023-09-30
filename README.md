@@ -26,6 +26,7 @@ This tool is for querying the mailingLists associated with your account.  First 
 .env
 
 example file for va
+
 ```
 APITOKEN=FAKEIe58WHnDjwvB0zk0vabc13gas635dd
 DATACENTER=gov1
@@ -60,4 +61,12 @@ Now provide the index in the command.  This will extract all the data into a jso
 
 ```
 ./LNPIQualtrics.py --cmd surveys --index 1
+```
+
+The decoders for tasks defined in the decoders directory are automatically applied to any values data matching the name found in modules in the decoders(e.g., SpatialSpan, TrailsAB).
+
+To generate a csv output suitable for use as a dataframe, use the following options. The file will end in _df.csv
+
+```
+./LNPQualtrics.py --cmd surveys --index 1 --dataframe
 ```
