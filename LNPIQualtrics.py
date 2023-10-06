@@ -31,7 +31,7 @@ class LNPIQualtrics:
     
     def __init__(self, apiToken, dataCenter,directoryId,
                  verify=True,nodecode=False,rawdata=False,
-                 dataframe = False):
+                 dataframe = False, extref=None):
         
         self.apiToken = apiToken
         self.dataCenter = dataCenter
@@ -40,6 +40,7 @@ class LNPIQualtrics:
         self.nodecode=nodecode
         self.rawdata=rawdata
         self.dataframe = dataframe
+        self.extref = extref
 
     def getMailingLists(self):
         """
@@ -357,7 +358,8 @@ class LNPIQualtrics:
         """ 
         export the file
         """
-        
+            
+            
         surveyInfo = self.getSurveyInformation(surveyId)
         
         if fileId == None:
@@ -404,6 +406,36 @@ class LNPIQualtrics:
                     ddict = self.relabelData(ddict, surveyInfo)
                     # convert a list with single item to a number
                     ddict = self.delistValues(ddict)
+                    
+                if self.extref:
+                    # get the mailing list and add the extref variable,
+                    # matching based on the email from mailing list and the survey
+                    mailingLists = self.getMailingLists()
+                    
+                    mailingListId = None
+                    for mailingListEntry in mailingLists:
+                        # match the name with extref
+                        if mailingListEntry['name'] == self.extref:
+                            mailingListId = mailingListEntry['mailingListId']
+                            # get the mailingList
+                            mailingList = self.getContactsMailingList(mailingListId)
+                            # create lookup dictionary  email, extref
+                            emailLookup = {}
+                            for item in mailingList:
+                                emailLookup[item['email']] = item['extRef']
+                                pass
+                            
+                            # do lookup of ddict['responses'][index]['recipientEmail']
+                            for index, data in enumerate(ddict['responses']):
+                                extRef = emailLookup.get(data['values']['recipientEmail'], None)
+                                # add to ddict['responses'][index]['values']['extRef']
+                                ddict['responses'][index]['values']['extRef'] = extRef
+                                pass
+                    if mailingListId == None:
+                        # error no match
+                        print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
+                        exit(1)
+                    
                 # add the surveyInfo
                 ddict['surveyInfo'] = surveyInfo
                 ddict['extractionDateTime'] = str(dt)
@@ -540,7 +572,7 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False, dataframe = False,                
+        nodecode = False, rawdata=False, dataframe = False, extref=None               
 ):
     
     config = dotenv_values(env)
@@ -558,7 +590,7 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
                        nodecode=nodecode, rawdata=rawdata, 
-                       dataframe=dataframe )
+                       dataframe=dataframe, extref = extref)
     
     mailingLists = qc.getMailingLists()  
 
@@ -644,10 +676,13 @@ if __name__ == "__main__":
     parser.add_argument('--nodecode', help="do not decode taskdata", action='store_true')
     parser.add_argument('--rawdata', help="dump raw data", action='store_true')
     parser.add_argument('--dataframe', help="create csv dataframe", action='store_true')
+    parser.add_argument('--extref', type=str, help="use extref from mailing list as id, matching with email- give the mailing list name",
+                        default=None)
+
     args = parser.parse_args()
     
 
-    test = False
+    test = True
 
     if test:
         print("Warning: running in test mode")
@@ -655,6 +690,7 @@ if __name__ == "__main__":
         cmd = args.cmd
         cmd = 'surveys'
         index = 16
+        mailingListName = 'cLBP Mailing List'
         p = main(        
                     cmd = cmd,
                     index = index,
@@ -663,7 +699,8 @@ if __name__ == "__main__":
                     format = 'json', #args.format, 
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
-                    dataframe = True, #args.dataframe,                
+                    dataframe = True, #args.dataframe,  
+                    extref = mailingListName, #   args.extref,              
                 )
     else:
 
@@ -676,6 +713,7 @@ if __name__ == "__main__":
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
                     dataframe = args.dataframe,                
+                    extref = args.extref,              
 
                 )
         
