@@ -70,3 +70,9 @@ To generate a csv output suitable for use as a dataframe, use the following opti
 ```
 ./LNPQualtrics.py --cmd surveys --index 1 --dataframe
 ```
+
+To add the extRef from the mailingList, pass the name of the mailing list.
+
+```
+./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 16
+```
