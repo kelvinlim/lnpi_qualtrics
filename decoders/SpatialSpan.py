@@ -17,16 +17,23 @@ def decode(jsonData, label='SpatialSpan'):
     results={}
     if type(jsonData) is list:
         for item in jsonData:
-            if item['trial_type'] == 'spatial-span-recall':
+            if item['trial_type'] == 'spatial-span-recall' and 'set_size' in item:
                 # append accuracy to the proper bin
                 accuracy[str(item['set_size'])].append(item['accuracy'])
                 #print(item)
+            else:
+                 pass
         # calculate different metrics
         # percent correct
         for key in accuracy.keys():
-            # calculate mean and then percent correct
-            meanAccuracy = mean(accuracy[key])
-            percentCorrect = meanAccuracy/float(key)
+            # make sure the list is not empty before calculations
+            if len(accuracy[key]) > 0:
+                # calculate mean and then percent correct
+                meanAccuracy = mean(accuracy[key])
+                percentCorrect = meanAccuracy/float(key)
+            else:
+                percentCorrect = None
+
             # store in  results
             newKey = f"{label}{key}_perc_accuracy"
             results[newKey]=percentCorrect      
