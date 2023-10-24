@@ -487,6 +487,11 @@ class LNPIQualtrics:
             # make a copy of original since we are changing the keys!
             origResponseValuesKeys = list(response['values'].keys())
             for dataKey in origResponseValuesKeys:
+
+                # for debugging scipain data                    
+                # if dataKey in ['QID73','QID76','QID77']:
+                #     xyz = 1
+                #     pass
                 
                 if dataKey in surveyInfo['questions'].keys():
                     # get the newLabel
