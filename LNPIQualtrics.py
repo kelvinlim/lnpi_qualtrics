@@ -229,7 +229,22 @@ class LNPIQualtrics:
         fileId = self.exportResponsesProgress(surveyId, progressId)
         if fileId != None:
             # get the file
-            data = self.exportResponsesFile(surveyId, fileId=fileId)
+            # data = self.exportResponsesFile(surveyId, fileId=fileId)
+            responses_list, newFileName = self.getDownloadRest(surveyId, fileId = fileId)
+            
+            if self.rawdata:
+                # write out the raw data to a json file
+                with open(newFileName, "w") as fp:
+                    json.dump(responses_list, fp, indent=4)
+                
+            # process the Responses
+            ddict = self.processResponses(surveyId, responses_list)
+            if self.dataframe:
+                # output the 'values' as a csv using a dataframe
+                df = self.createDataFrame(ddict)
+                # change the name of the file
+                dfFileName = newFileName.replace(".json","_df.csv")
+                df.to_csv(dfFileName)
             pass
         
 
@@ -460,6 +475,110 @@ class LNPIQualtrics:
             pp.pprint(response.content)
             return None     
 
+    def getDownloadRest(self, surveyId, fileId = None):
+        """ 
+        get the download through the REST API
+        
+        returns responses_list (dict) and the newFilename 
+        """
+        
+        if fileId == None:
+            fileId = self.fileId
+            
+        baseUrl = f"https://{self.dataCenter}.qualtrics.com/API/v3/surveys/{surveyId}/export-responses/{fileId}/file"
+        
+        headers = {
+            "x-api-token": self.apiToken,
+        }
+        response = requests.get(baseUrl, headers=headers, verify=self.verify)
+        # if OK
+        if response.status_code == 200:
+            # file is in response.content
+            zf = zipfile.ZipFile(io.BytesIO(response.content))
+            # assume only one file
+            origFileName = zf.filelist[0].filename
+            
+            # get the filetype from the file suffix
+            format = os.path.splitext(origFileName)[1]  # returns .json or .csv
+            # create a datetime string for the filename
+            dt = datetime.now()
+            str_date_time = dt.strftime("%Y%m%d_%H%M")
+            
+            # replace the spaces with _
+            newFileName = origFileName.replace(" ","_")
+            # replace {format} with datetime{format}
+            newFileName = newFileName.replace(f"{format}", f"_{str_date_time}{format}")
+
+            # extract the file
+            # open the file and read the contents 
+            with zf.open(origFileName) as myFile:
+                fileContents = myFile.read()
+            
+            if self.rawdata:
+                # self.nodecode = True  # don't decode data
+                format = '.json'
+                
+            if format=='.json':
+                # read json into a dict
+                ddict = json.loads(fileContents) 
+
+        else:
+            print(f"Error: {response.status_code}")
+            pp.pprint(response.content)
+            return None    
+                        
+        return ddict, newFileName
+    
+    def processResponses(self, surveyId, ddict, format='json'):
+        """
+        Process the responses
+        
+        """
+        surveyInfo = self.getSurveyInformation(surveyId)
+        
+        if format == 'json':        
+            if self.nodecode == False:
+                ddict = self.decodeData(ddict)
+                ddict = self.relabelData(ddict, surveyInfo)
+                # convert a list with single item to a number
+                ddict = self.delistValues(ddict)
+                
+            if self.extref:
+                # get the mailing list and add the extref variable,
+                # matching based on the email from mailing list and the survey
+                mailingLists = self.getMailingLists()
+                
+                mailingListId = None
+                for mailingListEntry in mailingLists:
+                    # match the name with extref
+                    if mailingListEntry['name'] == self.extref:
+                        mailingListId = mailingListEntry['mailingListId']
+                        # get the mailingList
+                        mailingList = self.getContactsMailingList(mailingListId)
+                        # create lookup dictionary  email, extref
+                        emailLookup = {}
+                        for item in mailingList:
+                            emailLookup[item['email']] = item['extRef']
+                            pass
+                        
+                        # do lookup of ddict['responses'][index]['recipientEmail']
+                        for index, data in enumerate(ddict['responses']):
+                            extRef = emailLookup.get(data['values']['recipientEmail'], None)
+                            # add to ddict['responses'][index]['values']['extRef']
+                            ddict['responses'][index]['values']['extRef'] = extRef
+                            pass
+                if mailingListId == None:
+                    # error no match
+                    print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
+                    exit(1)
+                
+            # add the surveyInfo
+            dt = datetime.now()
+            ddict['surveyInfo'] = surveyInfo
+            ddict['extractionDateTime'] = str(dt)
+            
+        return ddict
+    
     def createDataFrame(self, ddict):
         """
         Create a dataframe from the values in each response

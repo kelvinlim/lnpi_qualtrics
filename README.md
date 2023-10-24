@@ -76,3 +76,24 @@ To add the extRef from the mailingList, pass the name of the mailing list.
 ```
 ./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 16
 ```
+
+## Using web download of Responses instead of using REST API.
+
+For scipain ema study, certain variables (QN07-13) were not present when retrieved using REST API but were present when downloaded using the Web interface.
+
+We need an option to use the web download csv file instead of using the REST version.
+
+Currently use self.exportResponseFile() which also does the decode,
+relabeling and replace user info with extRef
+
+## Implement new  steps
+Have four methods to separate processes
+
+1) read_web_csv - Read the web download file and returns data a resources_list which is a list of dictionaries.
+
+2) getDownloadRest - get the responses data from the rest api as list of dictionaries.
+
+3) processResponses(responses_list) - do processing of responses, input is the responses_list, returns a new responses_list
+
+4) saveResponsesFile(responses_list, fileinfo)
+
