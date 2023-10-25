@@ -215,6 +215,91 @@ class LNPIQualtrics:
             pass
         return mailingList
        
+    def getResponsesWebFile(self, surveyId, webfile, format=format):
+        
+        """
+        Get the responses from a downloaded web csv file
+        
+        """
+        self.format = format
+        
+        # read in the file
+        df = pd.read_csv(webfile)
+        # drop first two rows
+        newdf = df.drop([0,1])
+        # convert newdf to a json string
+        json_str = newdf.to_json(orient="records")
+        # convert to list
+        responses_list = json.loads(json_str)
+            
+        # create newFileName from webfile, replace .csv with json
+        newFileName = webfile.replace('.csv','.json')   
+        if self.rawdata:
+            # write out the raw data to a json file
+            with open(newFileName, "w") as fp:
+                json.dump(responses_list, fp, indent=4)
+            
+        # process the Responses
+        # ddict = self.processResponses(surveyId, {"responses":responses_list})
+        
+        new_responses = []
+        # simulate the "values"
+        for item in responses_list:
+            tmp_dict = {}
+            tmp_dict['values'] = item
+            new_responses.append(tmp_dict)
+            pass
+        # place into another dict with key of "responses"
+        ddict = {}
+        ddict['responses'] = new_responses
+        if self.nodecode == False:
+            ddict = self.decodeData(ddict)
+            pass
+
+        ddict = self.delistValues(ddict)
+            
+        if self.extref:
+            # get the mailing list and add the extref variable,
+            # matching based on the email from mailing list and the survey
+            mailingLists = self.getMailingLists()
+            
+            mailingListId = None
+            for mailingListEntry in mailingLists:
+                # match the name with extref
+                if mailingListEntry['name'] == self.extref:
+                    mailingListId = mailingListEntry['mailingListId']
+                    # get the mailingList
+                    mailingList = self.getContactsMailingList(mailingListId)
+                    # create lookup dictionary  email, extref
+                    emailLookup = {}
+                    for item in mailingList:
+                        emailLookup[item['email']] = item['extRef']
+                        pass
+                    
+                    # do lookup of ddict['responses'][index]['recipientEmail']
+                    for index, data in enumerate(ddict['responses']):
+                        extRef = emailLookup.get(data['values']['RecipientEmail'], None)
+                        # add to ddict['responses'][index]['values']['extRef']
+                        ddict['responses'][index]['values']['extRef'] = extRef
+                        pass
+            if mailingListId == None:
+                # error no match
+                print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
+                exit(1)
+            
+        # add the surveyInfo
+        dt = datetime.now()
+        surveyInfo = self.getSurveyInformation(surveyId)
+        ddict['surveyInfo'] = surveyInfo
+        ddict['extractionDateTime'] = str(dt)
+            
+        if self.dataframe:
+            # output the 'values' as a csv using a dataframe
+            df = self.createDataFrame(ddict)
+            # change the name of the file
+            dfFileName = newFileName.replace(".json","_df.csv")
+            df.to_csv(dfFileName, index=False)
+        pass
        
     def getResponses(self, surveyId, format='json'):
         """
@@ -696,7 +781,7 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False, dataframe = False, extref=None               
+        nodecode = False, rawdata=False, dataframe = False, extref=None,webfile=None               
 ):
     
     config = dotenv_values(env)
@@ -745,6 +830,16 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
             print(f"Subject index: {i+1} {mailingLists[index-1]['name']} {updatedMailingList[i]['email']}") 
             print(f"==============")
             pp.pprint(updatedMailingList[i])
+    elif cmd == 'surveys' and webfile != None:
+        
+        # retrieve surveys accessible by the user
+        surveyLists = qc.getSurveyList()
+        
+        # get the surveyId for the index
+        surveyId = surveyLists[index-1]['id']
+        
+        qc.getResponsesWebFile(surveyId, webfile, format=format)
+        
     elif cmd == 'surveys' and index==None:
         # retrieve surveys accessible by the user
         surveyLists = qc.getSurveyList()
@@ -800,6 +895,8 @@ if __name__ == "__main__":
     parser.add_argument('--nodecode', help="do not decode taskdata", action='store_true')
     parser.add_argument('--rawdata', help="dump raw data", action='store_true')
     parser.add_argument('--dataframe', help="create csv dataframe", action='store_true')
+    parser.add_argument('--webfile', type=str, help="read survey data from csv download through qualtrics web site", 
+                        default=None)
     parser.add_argument('--extref', type=str, help="use extref from mailing list as id, matching with email- give the mailing list name",
                         default=None)
 
@@ -824,7 +921,9 @@ if __name__ == "__main__":
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
                     dataframe = True, #args.dataframe,  
-                    extref = mailingListName, #   args.extref,              
+                    extref = mailingListName, #   args.extref,     
+                    webfile = args.webfile,
+                            
                 )
     else:
 
@@ -837,7 +936,8 @@ if __name__ == "__main__":
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
                     dataframe = args.dataframe,                
-                    extref = args.extref,              
+                    extref = args.extref,  
+                    webfile = args.webfile,
 
                 )
         

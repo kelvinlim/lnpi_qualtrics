@@ -74,7 +74,13 @@ To generate a csv output suitable for use as a dataframe, use the following opti
 To add the extRef from the mailingList, pass the name of the mailing list.
 
 ```
-./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 16
+./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 22
+```
+
+To use a web csv file downloaded through the qualtrics web GUI
+
+```
+./LNPIQualtrics.py --cmd surveys --dataframe --extref 'SCI Mailing List' --index 22 --webfile EMA+spinal+cord+injury_20231023_download.csv
 ```
 
 ## Using web download of Responses instead of using REST API.
