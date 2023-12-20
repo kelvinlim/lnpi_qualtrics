@@ -648,6 +648,58 @@ class LNPIQualtrics:
                         
                         # do lookup of ddict['responses'][index]['recipientEmail']
                         for index, data in enumerate(ddict['responses']):
+                            # get subject email if it exists
+                            subj_email = data['values'].get('recipientEmail',None)
+                            extRef = emailLookup.get(subj_email, None) 
+                            # add to ddict['responses'][index]['values']['extRef']
+                            ddict['responses'][index]['values']['extRef'] = extRef
+                            pass
+                if mailingListId == None:
+                    # error no match
+                    print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
+                    exit(1)
+                
+            # add the surveyInfo
+            dt = datetime.now()
+            ddict['surveyInfo'] = surveyInfo
+            ddict['extractionDateTime'] = str(dt)
+            
+        return ddict
+
+    def processResponses_orig(self, surveyId, ddict, format='json'):
+        """
+        Process the responses
+        
+        """
+        surveyInfo = self.getSurveyInformation(surveyId)
+        
+        if format == 'json':        
+            if self.nodecode == False:
+                ddict = self.decodeData(ddict)
+                ddict = self.relabelData(ddict, surveyInfo)
+                # convert a list with single item to a number
+                ddict = self.delistValues(ddict)
+                
+            if self.extref:
+                # get the mailing list and add the extref variable,
+                # matching based on the email from mailing list and the survey
+                mailingLists = self.getMailingLists()
+                
+                mailingListId = None
+                for mailingListEntry in mailingLists:
+                    # match the name with extref
+                    if mailingListEntry['name'] == self.extref:
+                        mailingListId = mailingListEntry['mailingListId']
+                        # get the mailingList
+                        mailingList = self.getContactsMailingList(mailingListId)
+                        # create lookup dictionary  email, extref
+                        emailLookup = {}
+                        for item in mailingList:
+                            emailLookup[item['email']] = item['extRef']
+                            pass
+                        
+                        # do lookup of ddict['responses'][index]['recipientEmail']
+                        for index, data in enumerate(ddict['responses']):
                             extRef = emailLookup.get(data['values']['recipientEmail'], None) 
                             # add to ddict['responses'][index]['values']['extRef']
                             ddict['responses'][index]['values']['extRef'] = extRef
@@ -663,6 +715,7 @@ class LNPIQualtrics:
             ddict['extractionDateTime'] = str(dt)
             
         return ddict
+
     
     def createDataFrame(self, ddict):
         """
