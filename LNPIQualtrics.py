@@ -648,7 +648,7 @@ class LNPIQualtrics:
                         
                         # do lookup of ddict['responses'][index]['recipientEmail']
                         for index, data in enumerate(ddict['responses']):
-                            extRef = emailLookup.get(data['values']['recipientEmail'], None)
+                            extRef = emailLookup.get(data['values']['recipientEmail'], None) 
                             # add to ddict['responses'][index]['values']['extRef']
                             ddict['responses'][index]['values']['extRef'] = extRef
                             pass

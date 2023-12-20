@@ -23,11 +23,17 @@ def decode(gridData,label='Grid'):
             # convert to seconds float
             value = value/1000.0
             results[key]=value
+            # add the inverse of secs so that higher values are better
+            new_key = key + "inv"
+            value=1.0/value
+            results[new_key]=value
     else:
         # empty results
         results = {
             f"{label}A_secs": None,
             f"{label}B_secs": None,            
+            f"{label}A_secsinv": None,
+            f"{label}B_secsinv": None, 
         }
         
     return results    

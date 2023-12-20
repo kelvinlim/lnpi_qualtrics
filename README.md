@@ -80,7 +80,7 @@ To add the extRef from the mailingList, pass the name of the mailing list.
 To use a web csv file downloaded through the qualtrics web GUI
 
 ```
-./LNPIQualtrics.py --cmd surveys --dataframe --extref 'SCI Mailing List' --index 22 --webfile EMA+spinal+cord+injury_20231023_download.csv
+./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 2 --webfile ../cda_emapain/proj_backpain/EMA+chronic+low+back+pain_December+7,+2023_13.13.csv
 ```
 
 ## Using web download of Responses instead of using REST API.
@@ -93,13 +93,10 @@ Currently use self.exportResponseFile() which also does the decode,
 relabeling and replace user info with extRef
 
 ## Implement new  steps
+
 Have four methods to separate processes
 
 1) read_web_csv - Read the web download file and returns data a resources_list which is a list of dictionaries.
-
 2) getDownloadRest - get the responses data from the rest api as list of dictionaries.
-
 3) processResponses(responses_list) - do processing of responses, input is the responses_list, returns a new responses_list
-
 4) saveResponsesFile(responses_list, fileinfo)
-
