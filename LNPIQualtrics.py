@@ -22,6 +22,14 @@ from decoders import *
 
 pp = pprint.PrettyPrinter(indent=4)
 
+
+__version_info__ = ('0', '1', '0')
+__version__ = '.'.join(__version_info__)
+"""
+0.1.0
+
+"""
+
 class LNPIQualtrics:
     
     """
@@ -952,6 +960,7 @@ if __name__ == "__main__":
                         default=None)
     parser.add_argument('--extref', type=str, help="use extref from mailing list as id, matching with email- give the mailing list name",
                         default=None)
+    parser.add_argument('-V', '--version', action='version', version=f'%(prog)s {__version__}')
 
     args = parser.parse_args()
     
