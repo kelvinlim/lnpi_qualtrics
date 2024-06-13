@@ -100,3 +100,18 @@ Have four methods to separate processes
 2) getDownloadRest - get the responses data from the rest api as list of dictionaries.
 3) processResponses(responses_list) - do processing of responses, input is the responses_list, returns a new responses_list
 4) saveResponsesFile(responses_list, fileinfo)
+
+## To make the executable
+```
+pyinstaller --onefile LNPIQualtrics.py
+
+Error on execution  LNPIQaultrics -V
+
+Traceback (most recent call last):
+  File "LNPIQualtrics.py", line 21, in <module>
+    from decoders import *
+AttributeError: module 'decoders' has no attribute 'SpatialSpan'
+[49974] Failed to execute script 'LNPIQualtrics' due to unhandled exception!
+
+
+```
