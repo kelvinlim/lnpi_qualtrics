@@ -1,2 +1,11 @@
 .env
 .venv/
+*.spec
+*.pyc
+__pycache__/
+build/
+dist/
+
+
+
+
