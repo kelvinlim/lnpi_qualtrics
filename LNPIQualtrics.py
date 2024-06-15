@@ -23,10 +23,11 @@ from decoders import *
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '1', '0')
+__version_info__ = ('0', '1', '1')
 __version__ = '.'.join(__version_info__)
 """
-0.1.0
+0.1.1 - add label output using second row from the webfile
+0.1.0 initial
 
 """
 
@@ -223,6 +224,31 @@ class LNPIQualtrics:
             pass
         return mailingList
        
+    def generateDescriptions(self,df)->str:
+        """
+        creates mapping of variable name to description
+        
+        from webfile, first row contains the variable name and the second row the description
+        
+        output in yaml dict format to make it easier to generate config file
+        
+        """
+        # get the variables
+        vars = list(df.columns)
+        # get the first row
+        firstRow = df.iloc[0]
+        
+        text  = "-\n"
+        text += "  op: rename\n"
+        text += "  arg:\n"
+
+        for index in range(len(firstRow)):
+            # remove \n from  description
+            description = firstRow[index].replace('\n',' ')
+            text += f"    {vars[index]}: {description}\n"
+            pass
+        return text
+    
     def getResponsesWebFile(self, surveyId, webfile, format=format):
         
         """
@@ -233,6 +259,8 @@ class LNPIQualtrics:
         
         # read in the file
         df = pd.read_csv(webfile)
+        # generate descriptions
+        descriptions = self.generateDescriptions(df)
         # drop first two rows
         newdf = df.drop([0,1])
         # convert newdf to a json string
@@ -300,6 +328,11 @@ class LNPIQualtrics:
         surveyInfo = self.getSurveyInformation(surveyId)
         ddict['surveyInfo'] = surveyInfo
         ddict['extractionDateTime'] = str(dt)
+            
+        # create description file
+        descFileName = webfile.replace('.csv','_descr.txt') 
+        with open(descFileName, "w") as fp:
+            fp.write(descriptions)
             
         if self.dataframe:
             # output the 'values' as a csv using a dataframe
