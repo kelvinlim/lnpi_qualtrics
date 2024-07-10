@@ -81,6 +81,10 @@ To use a web csv file downloaded through the qualtrics web GUI
 
 ```
 ./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 2 --webfile ../cda_emapain/proj_backpain/EMA+chronic+low+back+pain_December+7,+2023_13.13.csv
+
+# for covidema
+./LNPIQualtrics.py --cmd surveys --dataframe  --extref "Test covid ema" --webfile ../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv --index 12 
+
 ```
 
 ## Using web download of Responses instead of using REST API.
@@ -102,6 +106,7 @@ Have four methods to separate processes
 4) saveResponsesFile(responses_list, fileinfo)
 
 ## To make the executable
+
 ```
 pyinstaller --onefile LNPIQualtrics.py
 

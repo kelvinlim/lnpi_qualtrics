@@ -1,0 +1,105 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+
+    
+        {
+            "name": "Python: LNPIQualtrics.py",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--extref",
+                "cLBP Mailing List",
+                "--index",
+                "21"
+            ]
+        },
+        {
+            "name": "Python: LNPIQualtrics.py SCI",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--rawdata",
+                "--extref",
+                "SCI Mailing List",
+                "--index",
+                "22"
+            ]
+        },
+         
+        {
+            "name": "Python: LNPIQualtrics.py SCI web",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--rawdata",
+                "--extref",
+                "SCI Mailing List",
+                "--index",
+                "22",
+                "--webfile",
+                "EMA+spinal+cord+injury_20231023_download.csv"
+            ]
+        },       
+        {
+            "name": "Python: LNPIQualtrics.py covid web",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--rawdata",
+                "--extref",
+                "Test covid ema",
+                "--index",
+                "12",
+                "--webfile",
+                "../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv"
+            ]
+        },
+        {
+            "name": "Python: LNPIQualtrics.py covid",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--rawdata",
+                "--extref",
+                "covidema 20230223",
+                "--index",
+                "11"
+            ]
+        }        
+    ]
+}

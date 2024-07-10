@@ -856,8 +856,17 @@ class LNPIQualtrics:
         for response in ddict['responses']:
             
             for task in tasks:
-                # check if task is here
-                if task in response['values'].keys():
+                # check if task data is here
+                # values seen None and '-1', '{}
+                # check if tdata is a str
+                tdata = response['values'].get(task, None)
+                if tdata in ['-1','{}']:
+                #if tdata == '-1':
+                    # set to None
+                    tdata = None
+                if type(tdata) == str:
+                #if tdata is not None or (tdata != '-1'):
+                #if task in response['values'].keys():
                     # get the json string and convert into a dict
                     taskData = json.loads(response['values'][task]) 
                     
