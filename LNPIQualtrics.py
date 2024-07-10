@@ -23,9 +23,10 @@ from decoders import *
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '1', '1')
+__version_info__ = ('0', '1', '2')
 __version__ = '.'.join(__version_info__)
 """
+0.1.2 - fixed bug in decode to check for multiple empty cog task entries None,'-1','{}'
 0.1.1 - add label output using second row from the webfile
 0.1.0 initial
 
