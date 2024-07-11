@@ -19,13 +19,15 @@ import io
 import os
 from datetime import datetime
 from decoders import *
+import numpy as np
 
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '1', '2')
+__version_info__ = ('0', '1', '3')
 __version__ = '.'.join(__version_info__)
 """
+0.1.3 - add arg for sublist
 0.1.2 - fixed bug in decode to check for multiple empty cog task entries None,'-1','{}'
 0.1.1 - add label output using second row from the webfile
 0.1.0 initial
@@ -41,7 +43,7 @@ class LNPIQualtrics:
     
     def __init__(self, apiToken, dataCenter,directoryId,
                  verify=True,nodecode=False,rawdata=False,
-                 dataframe = False, extref=None):
+                 dataframe = False, extref=None,sublist=None):
         
         self.apiToken = apiToken
         self.dataCenter = dataCenter
@@ -51,6 +53,7 @@ class LNPIQualtrics:
         self.rawdata=rawdata
         self.dataframe = dataframe
         self.extref = extref
+        self.sublist = sublist
 
     def getMailingLists(self):
         """
@@ -317,12 +320,34 @@ class LNPIQualtrics:
                     for index, data in enumerate(ddict['responses']):
                         extRef = emailLookup.get(data['values']['RecipientEmail'], None)
                         # add to ddict['responses'][index]['values']['extRef']
+                        if extRef is not None:
+                            abc_dummy = 1
+                            pass
                         ddict['responses'][index]['values']['extRef'] = extRef
                         pass
             if mailingListId == None:
                 # error no match
                 print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
                 exit(1)
+        elif self.sublist:
+            # use csv file mapping email to id
+            ml_df = pd.read_csv(self.sublist)
+            # convert into a dict
+            email_dict  = ml_df.set_index('emails').to_dict(orient='dict')['id']
+
+            # do lookup of ddict['responses'][index]['recipientEmail']
+            for index, data in enumerate(ddict['responses']):
+                #extRef = emailLookup.get(data['values']['RecipientEmail'], None)
+                extRef = email_dict.get(data['values']['RecipientEmail'], np.nan)
+
+                # add to ddict['responses'][index]['values']['extRef']
+                # check for nan
+                if not np.isnan(extRef):
+                    abc_dummy = 1
+                    pass
+                ddict['responses'][index]['values']['extRef'] = extRef
+
+            pass
             
         # add the surveyInfo
         dt = datetime.now()
@@ -885,7 +910,7 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False, dataframe = False, extref=None,webfile=None               
+        nodecode = False, rawdata=False, dataframe = False, extref=None,webfile=None,sublist=None               
 ):
     
     config = dotenv_values(env)
@@ -903,7 +928,7 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
                        nodecode=nodecode, rawdata=rawdata, 
-                       dataframe=dataframe, extref = extref)
+                       dataframe=dataframe, extref = extref,sublist=sublist)
     
     mailingLists = qc.getMailingLists()  
 
@@ -982,7 +1007,10 @@ if __name__ == "__main__":
         survey that you want to extract.
         """
     )
- 
+
+    parser.add_argument("--sublist", type = str,
+                     help="name of file for subject email to id mapping, default None",
+                      default=None) 
     parser.add_argument("--env", type = str,
                      help="name of env file in the current directory, default .env",
                       default=".env") 
@@ -1043,6 +1071,7 @@ if __name__ == "__main__":
                     dataframe = args.dataframe,                
                     extref = args.extref,  
                     webfile = args.webfile,
+                    sublist = args.sublist
 
                 )
         

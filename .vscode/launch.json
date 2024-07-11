@@ -63,6 +63,27 @@
                 "EMA+spinal+cord+injury_20231023_download.csv"
             ]
         },       
+
+        {
+            "name": "Python: LNPIQualtrics.py covid web list",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "list",
+                "--dataframe",
+                "--rawdata",
+                "--extref",
+                "Test covid ema",
+                "--index",
+                "12",
+                "--webfile",
+                "../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv"
+            ]
+        },        
         {
             "name": "Python: LNPIQualtrics.py covid web",
             "type": "python",
@@ -83,6 +104,28 @@
                 "../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv"
             ]
         },
+        {
+            "name": "Python: LNPIQualtrics.py covid web sublist",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--dataframe",
+                "--rawdata",
+                // "--extref",
+                // "Test covid ema",
+                "--sublist",
+                "../cda_covidema/sublist_edit.csv",
+                "--index",
+                "12",
+                "--webfile",
+                "../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv"
+            ]
+        },        
         {
             "name": "Python: LNPIQualtrics.py covid",
             "type": "python",
