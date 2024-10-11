@@ -20,19 +20,35 @@ import os
 from datetime import datetime
 from decoders import *
 import numpy as np
+import textwrap
 
 pp = pprint.PrettyPrinter(indent=4)
 
 
 __version_info__ = ('0', '1', '3')
 __version__ = '.'.join(__version_info__)
+__version_history__ = \
 """
+0.2.1 - make dataframe output the default, expand help
+0.2.0 - add -H argument
 0.1.3 - add arg for sublist
 0.1.2 - fixed bug in decode to check for multiple empty cog task entries None,'-1','{}'
 0.1.1 - add label output using second row from the webfile
 0.1.0 initial
 
+To build:
+
+pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --onefile LNPIQualtrics.py
+
 """
+class VersionHistoryAction(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super().__init__(option_strings, dest, nargs=0, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        print("Version History:",end='')
+        print(__version_history__)
+        parser.exit()
 
 class LNPIQualtrics:
     
@@ -910,7 +926,7 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False, dataframe = False, extref=None,webfile=None,sublist=None               
+        nodecode = False, rawdata=False, extref=None,webfile=None,sublist=None               
 ):
     
     config = dotenv_values(env)
@@ -928,7 +944,7 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
                        nodecode=nodecode, rawdata=rawdata, 
-                       dataframe=dataframe, extref = extref,sublist=sublist)
+                       dataframe=True, extref = extref,sublist=sublist)
     
     mailingLists = qc.getMailingLists()  
 
@@ -976,10 +992,21 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
         # print out the contents
         #pp = pprint.PrettyPrinter(indent=4)
         for i in range(len(surveyLists)):
+            print(f"Surveyindex: {i+1} Title: {surveyLists[i]['name']}") 
+
+
+    elif cmd == 'surveyslong' and index==None:
+        # retrieve surveys accessible by the user
+        surveyLists = qc.getSurveyList()
+        
+        # print out the contents
+        #pp = pprint.PrettyPrinter(indent=4)
+        for i in range(len(surveyLists)):
             print(f"==============")
-            print(f"Survey index: {i+1} {surveyLists[i]['name']}") 
+            print(f"Survey index: {i+1} Title: {surveyLists[i]['name']}") 
             print(f"==============")
             pp.pprint(surveyLists[i])
+            
     elif cmd == 'surveys':
         # retrieve surveys accessible by the user
         surveyLists = qc.getSurveyList()
@@ -995,18 +1022,34 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
 
 
 if __name__ == "__main__":
+    
+    description = textwrap.dedent('''\
+    Gets information about MailingLists and Surveys. 
+    
+    Account information is read from a .env file which contains the 
+    APITOKEN, DATACENTER and DIRECTORYID.
+    
+    Here are some examples of using the command. Text following the $ is
+    the command that is entered at the command line in a terminal window.
+    
+    $ LNPIQualtrics
+    Without any arguments, the mailingLists are listed with their index. 
+    
+    $ LNPIQualtrics --index 1
+    When the index argument is provided, then contact details for that mailingList are printed.
+    
+    $ LNPQualtrics --cmd surveys
+    When the cmd argument is surveys, the surveys accessible by the user are listed with their index.
+    
+    $ LNPIQualtrics --cmd surveys --index 1
+    This will retrieve the responses for the survey with the index 1. Output is in a csv file. 
+    Cognition data is decoded by default.
+    
+    $ LNPIQualtrics --cmd surveys --index 1 --dataraw
+    This will retrieve the raw data for the survey with the index 1. Output is in a json file.
+''')
     parser = argparse.ArgumentParser(
-        description="""
-        Get information about MailingLists and Surveys. Account information is
-        read from a .env file which contains the APITOKEN, DATACENTER and DIRECTORYID.
-        Without any arguments, the mailingLists are listed with the index. 
-        When the index argumennt is provided, then contact details for that mailingList are printed.
-        
-        To extract the survey data, first use the --cmd surveys to get the index for the survey you 
-        want to extract.  Then add the --index number  argument where number is the index of your
-        survey that you want to extract.
-        """
-    )
+        description=description, formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument("--sublist", type = str,
                      help="name of file for subject email to id mapping, default None",
@@ -1026,13 +1069,12 @@ if __name__ == "__main__":
     #parser.add_argument('--test', dest='feature', default=False, action='store_true')
     parser.add_argument('--nodecode', help="do not decode taskdata", action='store_true')
     parser.add_argument('--rawdata', help="dump raw data", action='store_true')
-    parser.add_argument('--dataframe', help="create csv dataframe", action='store_true')
     parser.add_argument('--webfile', type=str, help="read survey data from csv download through qualtrics web site", 
                         default=None)
     parser.add_argument('--extref', type=str, help="use extref from mailing list as id, matching with email- give the mailing list name",
                         default=None)
     parser.add_argument('-V', '--version', action='version', version=f'%(prog)s {__version__}')
-
+    parser.add_argument('-H', '--history', action=VersionHistoryAction, help='Show version history')
     args = parser.parse_args()
     
 
@@ -1053,7 +1095,6 @@ if __name__ == "__main__":
                     format = 'json', #args.format, 
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
-                    dataframe = True, #args.dataframe,  
                     extref = mailingListName, #   args.extref,     
                     webfile = args.webfile,
                             
@@ -1068,7 +1109,6 @@ if __name__ == "__main__":
                     format = args.format, 
                     nodecode = args.nodecode,
                     rawdata = args.rawdata,
-                    dataframe = args.dataframe,                
                     extref = args.extref,  
                     webfile = args.webfile,
                     sublist = args.sublist

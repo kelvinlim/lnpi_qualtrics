@@ -143,6 +143,25 @@
                 "--index",
                 "11"
             ]
-        }        
+        },        
+        {
+            "name": "Python: LNPIQualtrics.py cpom",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "-h"
+                // "--cmd",
+                // "surveys",
+                // "--dataframe",
+                // "--rawdata",
+                // "--extref",
+                // "covidema 20230223",
+                // "--index",
+                // "11"
+            ]
+        } 
     ]
 }
