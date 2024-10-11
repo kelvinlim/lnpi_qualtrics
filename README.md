@@ -1,7 +1,13 @@
 # lnpi_qualtrics
 
-Tools for automating qualtrics surveys.
+Tools for automating taskw for qualtrics surveys.
 
+
+To build executable:
+```
+pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --onefile LNPIQualtrics.py
+
+```
 ## Prerequisites for running code
 
 You will need to setup a virtual environment.  To do this you will need a python 3.10 installation.
@@ -117,6 +123,17 @@ Traceback (most recent call last):
     from decoders import *
 AttributeError: module 'decoders' has no attribute 'SpatialSpan'
 [49974] Failed to execute script 'LNPIQualtrics' due to unhandled exception!
+
+## suggestions from CoPilot
+
+Check Hidden Imports: Ensure that all necessary modules are included in the PyInstaller build. You can use the --hidden-import flag to specify any missing modules. For example:
+
+
+pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --onefile LNPIQualtrics.py
+
+Debug Imports: Build your app with the --debug=imports flag to get a detailed list of imports and see if any are missing:
+
+pyinstaller --debug=imports LNPIQualtrics.py
 
 
 ```
