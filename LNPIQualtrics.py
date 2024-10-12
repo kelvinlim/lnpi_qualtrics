@@ -27,7 +27,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 __version_info__ = ('0', '2', '2')
 __version__ = '.'.join(__version_info__)
-__version_history__ = \
+version_history= \
 """
 0.2.2 - changed default env file to be the qualtrics_token file to ease
         compatiblity with other qualtrics scripts such as qualtrics_util
@@ -43,14 +43,6 @@ To build:
 pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --onefile LNPIQualtrics.py
 
 """
-class VersionHistoryAction(argparse.Action):
-    def __init__(self, option_strings, dest, **kwargs):
-        super().__init__(option_strings, dest, nargs=0, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        print("Version History:",end='')
-        print(__version_history__)
-        parser.exit()
 
 class LNPIQualtrics:
     
@@ -1035,18 +1027,21 @@ if __name__ == "__main__":
     the command that is entered at the command line in a terminal window.
     
     $ LNPIQualtrics
-    Without any arguments, the mailingLists are listed with their index. 
+    Without any arguments, the  surveys accessible by the user are listed with their index. 
     
-    $ LNPIQualtrics --index 1
-    When the index argument is provided, then contact details for that mailingList are printed.
-    
-    $ LNPQualtrics --cmd surveys
-    When the cmd argument is surveys, the surveys accessible by the user are listed with their index.
-    
-    $ LNPIQualtrics --cmd surveys --index 1
+    $ LNPIQualtrics  --index 1
     This will retrieve the responses for the survey with the index 1. Output is in a csv file. 
     Cognition data is decoded by default.
-    
+
+    $ LNPIQualtrics --index 1 --dataraw
+    This will retrieve the raw data for the survey with the index 1. Output is in a json file.
+  
+    $ LNPIQualtrics --cmd list
+    Without the --cmd list argument, the list of accessible mailingLists are listed with their index. 
+   
+    $ LNPIQualtrics --cmd list --index 1
+    When the index argument is provided, then contact details for that mailingList are printed.
+       
     $ LNPIQualtrics --cmd surveys --index 1 --dataraw
     This will retrieve the raw data for the survey with the index 1. Output is in a json file.
 ''')
@@ -1064,8 +1059,8 @@ if __name__ == "__main__":
                       default=None) 
     parser.add_argument("--verbose", type=int, help="verbose level default 3",
                          default=3)   
-    parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default list",
-                         default='list')  
+    parser.add_argument("--cmd", type=str, help="command to run, [all, list, surveys], default surveys",
+                         default='surveys')  
     parser.add_argument("--format", type=str, help="output format, [json,csv], default json",
                          default='json')  
     #parser.add_argument('--test', dest='feature', default=False, action='store_true')
@@ -1076,9 +1071,13 @@ if __name__ == "__main__":
     parser.add_argument('--extref', type=str, help="use extref from mailing list as id, matching with email- give the mailing list name",
                         default=None)
     parser.add_argument('-V', '--version', action='version', version=f'%(prog)s {__version__}')
-    parser.add_argument('-H', '--history', action=VersionHistoryAction, help='Show version history')
+    parser.add_argument('-H', '--history', help='Show version history', action='store_true')
     args = parser.parse_args()
     
+    if args.history:
+        print(f"{os.path.basename(__file__) } Version: {__version__}")
+        print(version_history)
+        exit(0)
 
     test = False
 
