@@ -7,6 +7,7 @@ LNPI code for working with qualtrics
 Kelvin O. Lim
 """
 import requests
+import sys
 import json
 # Setting user Parameters
 from dotenv import dotenv_values
@@ -22,13 +23,17 @@ from decoders import *
 import numpy as np
 import textwrap
 
+import yaml
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '2', '2')
+__version_info__ = ('0', '2', '3')
 __version__ = '.'.join(__version_info__)
 version_history= \
 """
+0.2.3 - added use of config_qualtrics.yaml for configuration for full
+        compatibility with other qualtrics scripts such as qualtrics_util
 0.2.2 - changed default env file to be the qualtrics_token file to ease
         compatiblity with other qualtrics scripts such as qualtrics_util
 0.2.1 - make dataframe output the default, expand help
@@ -338,7 +343,7 @@ class LNPIQualtrics:
             if mailingListId == None:
                 # error no match
                 print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
-                exit(1)
+                sys.exit(1)
         elif self.sublist:
             # use csv file mapping email to id
             ml_df = pd.read_csv(self.sublist)
@@ -611,7 +616,7 @@ class LNPIQualtrics:
                     if mailingListId == None:
                         # error no match
                         print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
-                        exit(1)
+                        sys.exit(1)
                     
                 # add the surveyInfo
                 ddict['surveyInfo'] = surveyInfo
@@ -734,7 +739,7 @@ class LNPIQualtrics:
                 if mailingListId == None:
                     # error no match
                     print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
-                    exit(1)
+                    sys.exit(1)
                 
             # add the surveyInfo
             dt = datetime.now()
@@ -784,7 +789,7 @@ class LNPIQualtrics:
                 if mailingListId == None:
                     # error no match
                     print(f"Error, no mailingList with name {self.extref} was found. Please recheck the name")
-                    exit(1)
+                    sys.exit(1)
                 
             # add the surveyInfo
             dt = datetime.now()
@@ -920,25 +925,26 @@ class LNPIQualtrics:
         return newdict
 
 def main(cmd='all', index=None, verbose=3,env='.env', format='json',
-        nodecode = False, rawdata=False, extref=None,webfile=None,sublist=None               
-):
+        nodecode = False, rawdata=False, extref=None,webfile=None,sublist=None,
+        config_file = 'config_qualtrics.yaml'               
+    ):
     
-    config = dotenv_values(env)
+    environ = dotenv_values(env)
 
-    apiToken = config['QUALTRICS_APITOKEN']
-    dataCenter = config['DATACENTER']
-    directoryId = config['DIRECTORYID']
-    if "VERIFY" in config.keys():
-        if config['VERIFY'] == 'True':
-            verify=True
-        elif config['VERIFY'] == 'False':
-            verify = False
-    else:
-        verify = True
+    apiToken = environ['QUALTRICS_APITOKEN']
+    
+    # read these from the yaml config file
+    with open(config_file) as fp:
+        config=yaml.safe_load(fp)
+        
+    dataCenter = config['account']['DATA_CENTER']
+    directoryId = config['account']['DEFAULT_DIRECTORY']
+    verify = config['account'].get('VERIFY',True)
     
     qc = LNPIQualtrics(apiToken, dataCenter,directoryId, verify=verify,
                        nodecode=nodecode, rawdata=rawdata, 
-                       dataframe=True, extref = extref,sublist=sublist)
+                       dataframe=True, extref = extref,sublist=sublist,
+                    )
     
     mailingLists = qc.getMailingLists()  
 
@@ -946,7 +952,7 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
     
     if mailingLists == None:
         print(f"Error, no mailingLists found")
-        exit(1)
+        sys.exit(1)
 
     if cmd == 'list' and index==None:
         # get the list of mailingLists
@@ -1020,9 +1026,12 @@ if __name__ == "__main__":
     description = textwrap.dedent('''\
     Gets information about MailingLists and Surveys. 
     
-    Account information is read from a .env file which contains the 
-    APITOKEN, DATACENTER and DIRECTORYID.
-    
+    Two files are used to configure the program. The first is a yaml file
+    which defaults to config_qualtrics.yaml. This file contains the DATA_CENTER and 
+    DEFAULT_DIRECTORY. The second file is a .env file which contains the 
+    QUALTRICS_APITOKEN. These are the same files that are used by qualtrics_util
+    program.
+ 
     Here are some examples of using the command. Text following the $ is
     the command that is entered at the command line in a terminal window.
     
@@ -1048,6 +1057,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=description, formatter_class=argparse.RawTextHelpFormatter)
 
+    parser.add_argument("--config", type = str,
+                     help="config file, default is config_qualtrics.yaml",
+                     default='config_qualtrics.yaml'
+                     ) 
     parser.add_argument("--sublist", type = str,
                      help="name of file for subject email to id mapping, default None",
                       default=None) 
@@ -1077,43 +1090,23 @@ if __name__ == "__main__":
     if args.history:
         print(f"{os.path.basename(__file__) } Version: {__version__}")
         print(version_history)
-        exit(0)
+        sys.exit(0)
 
-    test = False
 
-    if test:
-        print("Warning: running in test mode")
 
-        cmd = args.cmd
-        cmd = 'surveys'
-        index = 16
-        mailingListName = 'cLBP Mailing List'
-        p = main(        
-                    cmd = cmd,
-                    index = index,
-                    verbose=args.verbose,
-                    env=args.env,
-                    format = 'json', #args.format, 
-                    nodecode = args.nodecode,
-                    rawdata = args.rawdata,
-                    extref = mailingListName, #   args.extref,     
-                    webfile = args.webfile,
-                            
-                )
-    else:
+    p = main(        
+                cmd = args.cmd,
+                index = args.index,
+                verbose=args.verbose,
+                env=args.env,
+                format = args.format, 
+                nodecode = args.nodecode,
+                rawdata = args.rawdata,
+                extref = args.extref,  
+                webfile = args.webfile,
+                sublist = args.sublist,
+                config_file=args.config
 
-        p = main(        
-                    cmd = args.cmd,
-                    index = args.index,
-                    verbose=args.verbose,
-                    env=args.env,
-                    format = args.format, 
-                    nodecode = args.nodecode,
-                    rawdata = args.rawdata,
-                    extref = args.extref,  
-                    webfile = args.webfile,
-                    sublist = args.sublist
-
-                )
+            )
         
       

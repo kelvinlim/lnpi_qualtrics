@@ -1,0 +1,31 @@
+# account info
+account:
+  DATA_CENTER: yul1
+  DEFAULT_DIRECTORY: POOL_3fAZGWRVfLKuxe3
+  LIBRARY_ID: GR_2fXBZYGAqiAoC3Q
+  VERIFY: True
+
+# project info
+project:
+  # Study ptsd
+  SURVEY_ID: SV_6Wi45DRitHabm7k
+  MESSAGE_ID: MS_na6UuTTk91XXASu
+  # ptsd_mailing_list
+  MAILING_LIST_ID: CG_31ZPX5GMG2FKZoA
+  TIMEZONE: America/Chicago
+  MINUTES_EXPIRE: 60
+
+MAILING_LISTS:
+
+# default embedded data
+embedded_data:
+  StartDate: '2024-03-16'
+  SurveysScheduled: 0
+  TimeSlots: 800,1200,1600,2000
+  UseSMS: 1
+  DeleteUnsent: 0
+  NumDays: 0
+  ExpireMinutes: 60
+  LogData: '[{"action":"init"}]'
+  TimeZone: America/Chicago
+ 
