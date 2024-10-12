@@ -25,10 +25,12 @@ import textwrap
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '1', '3')
+__version_info__ = ('0', '2', '2')
 __version__ = '.'.join(__version_info__)
 __version_history__ = \
 """
+0.2.2 - changed default env file to be the qualtrics_token file to ease
+        compatiblity with other qualtrics scripts such as qualtrics_util
 0.2.1 - make dataframe output the default, expand help
 0.2.0 - add -H argument
 0.1.3 - add arg for sublist
@@ -931,7 +933,7 @@ def main(cmd='all', index=None, verbose=3,env='.env', format='json',
     
     config = dotenv_values(env)
 
-    apiToken = config['APITOKEN']
+    apiToken = config['QUALTRICS_APITOKEN']
     dataCenter = config['DATACENTER']
     directoryId = config['DIRECTORYID']
     if "VERIFY" in config.keys():
@@ -1055,8 +1057,8 @@ if __name__ == "__main__":
                      help="name of file for subject email to id mapping, default None",
                       default=None) 
     parser.add_argument("--env", type = str,
-                     help="name of env file in the current directory, default .env",
-                      default=".env") 
+                     help="name of file containing api token in the current directory, default qualtrics_token",
+                      default="qualtrics_token") 
     parser.add_argument("--index", type = int,
                      help="index number of mailingList to print",
                       default=None) 

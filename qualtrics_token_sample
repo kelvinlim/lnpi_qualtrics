@@ -1,0 +1,6 @@
+# get this information from your Qualtrics settings
+QUALTRICS_APITOKEN=FAKEIe58WHnDjwvB0zk0v4zKluMw4dZNtwSEm3ux
+DATACENTER=ca1
+DIRECTORYID=POOL_3fAZGWRVfLKuxe3
+# uncomment the VERIFY line if running at VA
+#VERIFY=False
