@@ -34,6 +34,21 @@
                 "--cmd",
                 "surveys",
             ]
+        },    
+        {
+            "name": "Python: LNPIQualtrics.py  no  args va",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--config",
+                "config_qualtrics_va.yaml"
+
+            ]
         },
         {
             "name": "Python: LNPIQualtrics.py SCI",

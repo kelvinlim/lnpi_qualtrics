@@ -28,10 +28,11 @@ import yaml
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '2', '3')
+__version_info__ = ('0', '2', '4')
 __version__ = '.'.join(__version_info__)
 version_history= \
 """
+0.2.4 - make qualtrics_token default env file
 0.2.3 - added use of config_qualtrics.yaml for configuration for full
         compatibility with other qualtrics scripts such as qualtrics_util
 0.2.2 - changed default env file to be the qualtrics_token file to ease
@@ -1028,7 +1029,7 @@ if __name__ == "__main__":
     
     Two files are used to configure the program. The first is a yaml file
     which defaults to config_qualtrics.yaml. This file contains the DATA_CENTER and 
-    DEFAULT_DIRECTORY. The second file is a .env file which contains the 
+    DEFAULT_DIRECTORY. The second file is a qualtrics_token file which contains the 
     QUALTRICS_APITOKEN. These are the same files that are used by qualtrics_util
     program.
  

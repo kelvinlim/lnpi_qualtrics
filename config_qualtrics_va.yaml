@@ -1,0 +1,31 @@
+# account info
+account:
+  DATA_CENTER: gov1
+  DEFAULT_DIRECTORY: POOL_1zehdSNDM6AxO0l
+  LIBRARY_ID: UR_eX1d7mFGeoJRRs2
+  VERIFY: False
+
+# project info
+project:
+  
+  # Surveys
+  SURVEY_ID: SV_djaQaWNKvYMJhC6
+
+  MESSAGE_ID: MS_i0ofLX7AH5QNRMi
+
+  # Contact List
+  MAILING_LIST_ID: CG_32WwTFFU1ypKPGb 
+
+
+# default embedded data
+embedded_data:
+  StartDate: '2024-03-19'
+  SurveysScheduled: 0
+  TimeSlots: 800,1200,1600,2000
+  UseSMS: 1
+  DeleteUnsent: 0
+  NumDays: 0
+  ExpireMinutes: 60
+  LogData: '[{"action":"init"}]'
+  TimeZone: America/Chicago
+ 
