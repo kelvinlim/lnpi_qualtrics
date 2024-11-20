@@ -5,7 +5,7 @@ Tools for automating taskw for qualtrics surveys.
 
 To build executable:
 ```
-pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --onefile LNPIQualtrics.py
+pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.TrailsAB --hidden-import yaml --onefile LNPIQualtrics.py
 
 ```
 ## Prerequisites for running code
