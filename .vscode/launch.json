@@ -6,20 +6,19 @@
     "configurations": [
         
         {
-            "name": "Python: LNPIQualtrics.py",
+            "name": "Python: LNPIQualtrics.py index 29",
             "type": "python",
             "request": "launch",
             "program": "LNPIQualtrics.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args":[
-                "--cmd",
-                "surveys",
-                "--dataframe",
-                "--extref",
-                "cLBP Mailing List",
+                // "--cmd",
+                // "surveys",
+                // "--extref",
+                // "cLBP Mailing List",
                 "--index",
-                "21"
+                "29"
             ]
         },
     
