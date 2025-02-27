@@ -80,16 +80,16 @@ To generate a csv output suitable for use as a dataframe, use the following opti
 To add the extRef from the mailingList, pass the name of the mailing list.
 
 ```
-./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 22
+./LNPIQualtrics.py --cmd surveys --extref 'cLBP Mailing List' --index 22
 ```
 
 To use a web csv file downloaded through the qualtrics web GUI
 
 ```
-./LNPIQualtrics.py --cmd surveys --dataframe --extref 'cLBP Mailing List' --index 2 --webfile ../cda_emapain/proj_backpain/EMA+chronic+low+back+pain_December+7,+2023_13.13.csv
+./LNPIQualtrics.py --cmd surveys  --extref 'cLBP Mailing List' --index 2 --webfile ../cda_emapain/proj_backpain/EMA+chronic+low+back+pain_December+7,+2023_13.13.csv
 
 # for covidema
-./LNPIQualtrics.py --cmd surveys --dataframe  --extref "Test covid ema" --webfile ../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv --index 12 
+./LNPIQualtrics.py --cmd surveys   --extref "Test covid ema" --webfile ../cda_covidema/proj_covid240709/Long+COVID+EMA+survey_July+9,+2024_22.24.csv --index 12 
 
 ```
 
