@@ -1039,6 +1039,18 @@ if __name__ == "__main__":
     $ LNPIQualtrics
     Without any arguments, the  surveys accessible by the user are listed with their index. 
     
+                                  
+    This is the preferred download method since it provides more information than the API approach. 
+
+
+    # Use the provided ExternalReference column from the data export file from qualtrics for the subject ID.
+    # 
+    ./LNPIQualtrics.py --cmd surveys --index 1 --webfile ../cda_r34happiness/R34+EMA+spinal+cord+injury_June+13,+2025_22.48.csv
+
+    This generates two files based on the webfile:
+    1. xxx_df.csv - survey data and decoded task data
+    2. xxx_desc.txt - a txt file with the run_parse commands to rename the variables based on the information in the webfile
+
     $ LNPIQualtrics  --index 1
     This will retrieve the responses for the survey with the index 1. Output is in a csv file. 
     Cognition data is decoded by default.
