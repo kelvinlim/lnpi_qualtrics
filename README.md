@@ -27,7 +27,13 @@ pip install -r requirements.txt
 
 ## Command for querying mailing Lists
 
-This tool is for querying the mailingLists associated with your account.  First complete the .env file which contains information on your account needed for querying. This can be located on the qualtrics site by selecting the circle in the top right corner and then Account Settings followed by QualtricsIDs tab. You will need the API Token, the Datacenter ID and the Default Directory which will go into then entries APITOKEN, DATACENTER and DIRECTORYID respectively.
+This tool is for querying the mailingLists associated with your account.  First complete the qualtrics_token file which contains information on your account needed for querying. This information can be located on the qualtrics site by selecting the circle in the top right corner and then Account Settings followed by QualtricsIDs tab. You will need the API Token.
+
+Here is sample qualtrics_token file:
+
+```
+QUALTRICS_APITOKEN=FAKE_Ie58WHnDjwvB0zk0v4zKluMw4dZNtwSEm3ux
+```
 
 
 
