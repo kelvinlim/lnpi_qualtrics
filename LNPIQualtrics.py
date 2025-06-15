@@ -1043,7 +1043,7 @@ if __name__ == "__main__":
     This will retrieve the responses for the survey with the index 1. Output is in a csv file. 
     Cognition data is decoded by default.
 
-    $ LNPIQualtrics --index 1 --dataraw
+    $ LNPIQualtrics --index 1 --rawdata
     This will retrieve the raw data for the survey with the index 1. Output is in a json file.
   
     $ LNPIQualtrics --cmd list
@@ -1052,7 +1052,7 @@ if __name__ == "__main__":
     $ LNPIQualtrics --cmd list --index 1
     When the index argument is provided, then contact details for that mailingList are printed.
        
-    $ LNPIQualtrics --cmd surveys --index 1 --dataraw
+    $ LNPIQualtrics --cmd surveys --index 1 --rawdata
     This will retrieve the raw data for the survey with the index 1. Output is in a json file.
 ''')
     parser = argparse.ArgumentParser(

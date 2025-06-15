@@ -1,6 +1,6 @@
 # lnpi_qualtrics
 
-Tools for automating taskw for qualtrics surveys.
+Tools for automating tasks for managing data from qualtrics surveys.
 
 
 To build executable:
@@ -10,7 +10,7 @@ pyinstaller --hidden-import decoders.SpatialSpan --hidden-import decoders.Trails
 ```
 ## Prerequisites for running code
 
-You will need to setup a virtual environment.  To do this you will need a python 3.10 installation.
+You will need to setup a virtual environment.  To do this you will need at least a python 3.10 installation.
 
 ```
 # create the virtual environment
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 ## Command for querying mailing Lists
 
-This tool is for querying the mailingLists associated with your account.  First complete the .env file which contains information on your account needed for querying. This can be located on the qualtrics site by selecting the circle in the top right corner and then Account Settings followed by QualtricsIDs tab. You will the API Token, the Datacenter ID and the Default Directory which will go into then entries APITOKEN, DATACENTER and DIRECTORYID respectively.
+This tool is for querying the mailingLists associated with your account.  First complete the .env file which contains information on your account needed for querying. This can be located on the qualtrics site by selecting the circle in the top right corner and then Account Settings followed by QualtricsIDs tab. You will need the API Token, the Datacenter ID and the Default Directory which will go into then entries APITOKEN, DATACENTER and DIRECTORYID respectively.
 
 
 
@@ -83,9 +83,83 @@ To add the extRef from the mailingList, pass the name of the mailing list.
 ./LNPIQualtrics.py --cmd surveys --extref 'cLBP Mailing List' --index 22
 ```
 
-To use a web csv file downloaded through the qualtrics web GUI
+## Use a web csv file downloaded through the qualtrics web GUI
+
+This is the preferred download method since it provides more information than the API approach. 
 
 ```
+# Use the provided ExternalReference column from the data export file from qualtrics for the subject ID.
+# 
+./LNPIQualtrics.py --cmd surveys --index 1 --webfile ../cda_r34happiness/R34+EMA+spinal+cord+injury_June+13,+2025_22.48.csv
+
+This generates two files based on the webfile:
+1. xxx_df.csv - survey data and decoded task data
+2. xxx_desc.txt - a txt file with the run_parse commands to rename the variables based on the information in the webfile
+
+Here is an example of the desc.txt output. Notice that it provides
+part of the survey question:
+
+-
+  op: rename
+  arg:
+    StartDate: Start Date
+    EndDate: End Date
+    Status: Response Type
+    IPAddress: IP Address
+    Progress: Progress
+    Duration (in seconds): Duration (in seconds)
+    Finished: Finished
+    RecordedDate: Recorded Date
+    ResponseId: Response ID
+    RecipientLastName: Recipient Last Name
+    RecipientFirstName: Recipient First Name
+    RecipientEmail: Recipient Email
+    ExternalReference: External Data Reference
+    LocationLatitude: Location Latitude
+    LocationLongitude: Location Longitude
+    DistributionChannel: Distribution Channel
+    UserLanguage: User Language
+    Q_RecaptchaScore: Q_RecaptchaScore
+    QN01_intensity_NP: Right now, what is your neuropathic pain intensity?
+    QN02_control_NP: Right now, how in control do you feel about your neuropathic pain?
+    QN03_concerned_NP: Right now, how concerned are you about your neuropathic pain?
+    QN04_affect_funct_NP: Right now, how much is your neuropathic pain affecting your daily functioning?
+    QN05_fearful_move_NP: Right now, how fearful are you about moving because of your neuropathic pain?
+    QN06_activity: What activity did you do since your last diary entry?
+    QN07_low_exerc_min: How many minutes did you exercise/were you active?
+    QN08_mod_exerc_min: How many minutes did you exercise/were you active?
+    QN09_high_exerc_min: How many minutes did you exercise/were you active?
+    QN10_sleep_hours: How many hours of sleep did you get?
+    QN11_sleep_falling: Did you have trouble falling asleep?
+    QN12_sleep_staying: Did you have trouble staying asleep?
+    QN13_sleep_waking: Did you have trouble with waking up too early?
+    Q01_panas_active: Active
+    Q02_panas_determined: Determined
+    Q03_panas_attentive: Attentive
+    Q04_panas_inspired: Inspired
+    Q05_panas_alert: Alert
+    Q06_panas_afraid: Afraid
+    Q07_panas_nervous: Nervous
+    Q08_panas_upset: Upset
+    Q09_panas_hostile: Hostile
+    Q10_panas_ashamed: Ashamed
+    Q01_control_life: Right now, how in control do you feel about your life in general?
+    Q02_body_energy: Right now, how ENERGETIC does your body feel?
+    Q03_body_relax: Right now, how RELAXED does your BODY feel?
+    Q04_mind_relax: Right now, how RELAXED does your MIND feel?
+    Q41_Fitbit: A quick reminder to leave your Fitbit app open on your phone so we can collect the data.
+    TrailsAB-int: Did anything interrupt you during the previous task?
+    SymmetrySpan-int: Did anything interrupt the previous task?
+    SpatialSpan: SpatialSpan
+    TrailsAB: TrailsAB
+
+
+```
+
+
+
+```
+# using the mailing list to provide the External Data Reference (id of subject)
 ./LNPIQualtrics.py --cmd surveys  --extref 'cLBP Mailing List' --index 2 --webfile ../cda_emapain/proj_backpain/EMA+chronic+low+back+pain_December+7,+2023_13.13.csv
 
 # for covidema
