@@ -1,0 +1,72 @@
+[
+    {
+        "rt": 2500,
+        "stimulus": "<div style=\"font-size:20px;font-weight:bold;\">Which would you rather get?</div>",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 0,
+        "time_elapsed": 2504,
+        "internal_node_id": "0.0-0.0",
+        "index": [
+            16,
+            "3 weeks"
+        ],
+        "delay": true
+    },
+    {
+        "rt": 3972,
+        "stimulus": "<div style=\"font-size:20px;font-weight:bold;\">Which would you rather get?</div>",
+        "response": 1,
+        "trial_type": "html-button-response",
+        "trial_index": 1,
+        "time_elapsed": 6478,
+        "internal_node_id": "0.0-1.0",
+        "index": [
+            24,
+            "2 years"
+        ],
+        "delay": false
+    },
+    {
+        "rt": 1885,
+        "stimulus": "<div style=\"font-size:20px;font-weight:bold;\">Which would you rather get?</div>",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 2,
+        "time_elapsed": 8364,
+        "internal_node_id": "0.0-2.0",
+        "index": [
+            20,
+            "4 months"
+        ],
+        "delay": true
+    },
+    {
+        "rt": 3153,
+        "stimulus": "<div style=\"font-size:20px;font-weight:bold;\">Which would you rather get?</div>",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 3,
+        "time_elapsed": 11519,
+        "internal_node_id": "0.0-3.0",
+        "index": [
+            22,
+            "8 months"
+        ],
+        "delay": true
+    },
+    {
+        "rt": 4722,
+        "stimulus": "<div style=\"font-size:20px;font-weight:bold;\">Which would you rather get?</div>",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 4,
+        "time_elapsed": 16243,
+        "internal_node_id": "0.0-4.0",
+        "index": [
+            23,
+            "1 years"
+        ],
+        "delay": true
+    }
+]

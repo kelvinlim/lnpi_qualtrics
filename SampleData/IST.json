@@ -1,0 +1,697 @@
+[
+    {
+        "rt": 1970,
+        "stimulus": "\n      <p>In this experiment, you will tap the squares of the grid to reveal the color underneath.\n      </p><p>Your goal is to figure out whether there are more blue or yellow squares.</p>\n      <p>When you are ready to choose which color you think is the majority, </p>\n      <p>press one of the buttons on the bottom of the screen </p>\n      <p>(yellow to guess yellow, blue to guess blue).</p>\n    ",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 0,
+        "time_elapsed": 1973,
+        "internal_node_id": "0.0-0.0"
+    },
+    {
+        "rt": 11849,
+        "stimulus": "\n    <p>In this version, the amount you can win starts at 250 points and decreases for every square you click. So revealing every single box means you don't gain any points even if you answer correctly.</p>\n    <p>If you are incorrect you still lose 100 points no matter what.</p>\n    <p>Press 'START' to begin.</p>\n    ",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 1,
+        "time_elapsed": 15825,
+        "internal_node_id": "0.0-1.0-0.0"
+    },
+    {
+        "rt": 18273,
+        "stimulus": [
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow"
+        ],
+        "response": 1,
+        "answer": "yellow, 0",
+        "correct": false,
+        "pressed": [
+            [
+                "s20",
+                1059
+            ],
+            [
+                "s15",
+                1573
+            ],
+            [
+                "s10",
+                2092
+            ],
+            [
+                "s5",
+                2593
+            ],
+            [
+                "s0",
+                3126
+            ],
+            [
+                "s1",
+                4029
+            ],
+            [
+                "s6",
+                4529
+            ],
+            [
+                "s11",
+                5432
+            ],
+            [
+                "s16",
+                6082
+            ],
+            [
+                "s21",
+                6684
+            ],
+            [
+                "s22",
+                7469
+            ],
+            [
+                "s17",
+                8587
+            ],
+            [
+                "s12",
+                9320
+            ],
+            [
+                "s7",
+                10006
+            ],
+            [
+                "s2",
+                10625
+            ],
+            [
+                "s3",
+                16967
+            ]
+        ],
+        "points": -100,
+        "potentialPoints": 90,
+        "decreasing": true,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 2,
+        "time_elapsed": 36103,
+        "internal_node_id": "0.0-1.0-1.0"
+    },
+    {
+        "rt": 14708,
+        "stimulus": [
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "blue"
+        ],
+        "response": 1,
+        "answer": "blue, 1",
+        "correct": true,
+        "pressed": [
+            [
+                "s0",
+                3318
+            ],
+            [
+                "s5",
+                3919
+            ],
+            [
+                "s10",
+                4434
+            ],
+            [
+                "s15",
+                5021
+            ],
+            [
+                "s20",
+                5588
+            ],
+            [
+                "s21",
+                6439
+            ],
+            [
+                "s16",
+                6957
+            ],
+            [
+                "s11",
+                7509
+            ],
+            [
+                "s6",
+                8127
+            ],
+            [
+                "s1",
+                8679
+            ],
+            [
+                "s2",
+                11751
+            ],
+            [
+                "s7",
+                12554
+            ],
+            [
+                "s12",
+                13505
+            ]
+        ],
+        "points": 20,
+        "potentialPoints": 120,
+        "decreasing": true,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 3,
+        "time_elapsed": 50814,
+        "internal_node_id": "0.0-1.0-2.0",
+        "wins": 1
+    },
+    {
+        "rt": 12420,
+        "stimulus": [
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "blue"
+        ],
+        "response": 0,
+        "answer": "yellow, 0",
+        "correct": true,
+        "pressed": [
+            [
+                "s0",
+                2184
+            ],
+            [
+                "s5",
+                3018
+            ],
+            [
+                "s10",
+                3719
+            ],
+            [
+                "s1",
+                5505
+            ],
+            [
+                "s6",
+                6090
+            ],
+            [
+                "s11",
+                6690
+            ],
+            [
+                "s15",
+                8028
+            ],
+            [
+                "s16",
+                9163
+            ],
+            [
+                "s21",
+                10297
+            ],
+            [
+                "s20",
+                10981
+            ]
+        ],
+        "points": 170,
+        "potentialPoints": 150,
+        "decreasing": true,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 4,
+        "time_elapsed": 63237,
+        "internal_node_id": "0.0-1.0-3.0",
+        "wins": 2
+    },
+    {
+        "rt": 2334,
+        "stimulus": "\n      <p>In this version, you can click as many squares as you want without penalty. If you are correct, you will win 100 points and if you are wrong you will lose 100 points.</p>\n      <p>Press 'START' to begin.</p>\n    ",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 5,
+        "time_elapsed": 65573,
+        "internal_node_id": "0.0-2.0-0.0"
+    },
+    {
+        "rt": 19584,
+        "stimulus": [
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow"
+        ],
+        "response": 1,
+        "answer": "blue, 1",
+        "correct": true,
+        "pressed": [
+            [
+                "s0",
+                1852
+            ],
+            [
+                "s5",
+                2488
+            ],
+            [
+                "s10",
+                3105
+            ],
+            [
+                "s15",
+                3725
+            ],
+            [
+                "s20",
+                4373
+            ],
+            [
+                "s21",
+                5326
+            ],
+            [
+                "s16",
+                5792
+            ],
+            [
+                "s11",
+                6730
+            ],
+            [
+                "s6",
+                7296
+            ],
+            [
+                "s1",
+                8849
+            ],
+            [
+                "s22",
+                11152
+            ],
+            [
+                "s17",
+                11654
+            ],
+            [
+                "s12",
+                12289
+            ],
+            [
+                "s7",
+                13008
+            ],
+            [
+                "s2",
+                13606
+            ],
+            [
+                "s3",
+                18398
+            ]
+        ],
+        "points": 100,
+        "potentialPoints": 100,
+        "decreasing": false,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 6,
+        "time_elapsed": 87161,
+        "internal_node_id": "0.0-2.0-1.0",
+        "wins": 1
+    },
+    {
+        "rt": 23439,
+        "stimulus": [
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow"
+        ],
+        "response": 0,
+        "answer": "yellow, 0",
+        "correct": true,
+        "pressed": [
+            [
+                "s0",
+                2955
+            ],
+            [
+                "s5",
+                3688
+            ],
+            [
+                "s10",
+                4340
+            ],
+            [
+                "s15",
+                4990
+            ],
+            [
+                "s20",
+                5624
+            ],
+            [
+                "s21",
+                6360
+            ],
+            [
+                "s16",
+                7043
+            ],
+            [
+                "s11",
+                8296
+            ],
+            [
+                "s6",
+                8946
+            ],
+            [
+                "s1",
+                9548
+            ],
+            [
+                "s2",
+                10450
+            ],
+            [
+                "s7",
+                11084
+            ],
+            [
+                "s12",
+                12937
+            ],
+            [
+                "s17",
+                13605
+            ],
+            [
+                "s22",
+                14273
+            ],
+            [
+                "s23",
+                16642
+            ],
+            [
+                "s18",
+                17128
+            ],
+            [
+                "s13",
+                17710
+            ],
+            [
+                "s8",
+                18395
+            ],
+            [
+                "s3",
+                19030
+            ],
+            [
+                "s4",
+                19565
+            ],
+            [
+                "s9",
+                20082
+            ],
+            [
+                "s14",
+                20666
+            ],
+            [
+                "s19",
+                21266
+            ],
+            [
+                "s24",
+                21853
+            ]
+        ],
+        "points": 200,
+        "potentialPoints": 100,
+        "decreasing": false,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 7,
+        "time_elapsed": 110601,
+        "internal_node_id": "0.0-2.0-2.0",
+        "wins": 2
+    },
+    {
+        "rt": 15540,
+        "stimulus": [
+            "blue",
+            "blue",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "yellow",
+            "blue",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue",
+            "yellow",
+            "yellow",
+            "blue",
+            "yellow",
+            "blue"
+        ],
+        "response": 0,
+        "answer": "yellow, 0",
+        "correct": true,
+        "pressed": [
+            [
+                "s0",
+                2717
+            ],
+            [
+                "s5",
+                3320
+            ],
+            [
+                "s10",
+                3853
+            ],
+            [
+                "s15",
+                4438
+            ],
+            [
+                "s20",
+                4989
+            ],
+            [
+                "s21",
+                5508
+            ],
+            [
+                "s16",
+                6610
+            ],
+            [
+                "s11",
+                7709
+            ],
+            [
+                "s6",
+                8146
+            ],
+            [
+                "s1",
+                8633
+            ],
+            [
+                "s2",
+                9563
+            ],
+            [
+                "s7",
+                10063
+            ],
+            [
+                "s12",
+                10619
+            ],
+            [
+                "s17",
+                11165
+            ],
+            [
+                "s22",
+                11801
+            ],
+            [
+                "s23",
+                12384
+            ],
+            [
+                "s18",
+                12903
+            ],
+            [
+                "s13",
+                13486
+            ],
+            [
+                "s8",
+                14104
+            ]
+        ],
+        "points": 300,
+        "potentialPoints": 100,
+        "decreasing": false,
+        "task": "response",
+        "trial_type": "ist-grid",
+        "trial_index": 8,
+        "time_elapsed": 126144,
+        "internal_node_id": "0.0-2.0-3.0",
+        "wins": 3
+    },
+    {
+        "rt": 2102,
+        "stimulus": "\n      <p>Thanks for participating!</p>\n      <p>Press 'FINISH' to complete the task</p>\n    ",
+        "response": 0,
+        "trial_type": "html-button-response",
+        "trial_index": 9,
+        "time_elapsed": 128248,
+        "internal_node_id": "0.0-3.0"
+    }
+]

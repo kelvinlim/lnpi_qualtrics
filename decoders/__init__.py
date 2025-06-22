@@ -1,1 +1,1 @@
-__all__ = ["SpatialSpan", "TrailsAB"]
+__all__ = ["SpatialSpan", "TrailsAB","GoStop"]

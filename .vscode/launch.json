@@ -187,6 +187,35 @@
                 // "--index",
                 // "11"
             ]
-        } 
+        },
+        {
+            "name": "LNPIQualtrics.py CancerBatson",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--index",
+                "27",
+                "--webfile",
+                "../cda_cancerbatson/EMACancerBatson/CPOM_+ABatson_Survivorship+EMA+Survey+1_June+18,+2025_15.14.csv",
+            ]
+        },        
+        {
+            "name": "impulsivity_process test gostop",
+            "type": "python",
+            "request": "launch",
+            "program": "decoders/impulsivity_process.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "GoStop"
+            ]
+        },
+         
     ]
 }
