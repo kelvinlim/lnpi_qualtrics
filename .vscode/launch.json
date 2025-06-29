@@ -89,6 +89,21 @@
             ]
         },       
 
+                {
+            "name": "Python: LNPIQualtrics.py smartmind web",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--index",
+                "9",
+                "--webfile",
+                "../cda_smartmind/SMARTMIND_June+29,+2025_13.25.csv"            ]
+        }, 
         {
             "name": "Python: LNPIQualtrics.py covid web list",
             "type": "python",

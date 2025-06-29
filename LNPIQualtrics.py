@@ -28,10 +28,14 @@ import yaml
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '2', '4')
+__version_info__ = ('0', '2', '5')
 __version__ = '.'.join(__version_info__)
 version_history= \
 """
+0.2.5 - when using a webfile, use the TimeZone to change the naive datetime to a timezone aware datetime
+        this is found in the third row of the webfile. {"ImportId":"startDate","timeZone":"America/Chicago"}
+        Changed description = firstRow[index].replace('\n',' ') to 
+        description = firstRow.iloc[index].replace('\n',' ')
 0.2.4 - make qualtrics_token default env file
 0.2.3 - added use of config_qualtrics.yaml for configuration for full
         compatibility with other qualtrics scripts such as qualtrics_util
@@ -170,6 +174,34 @@ class LNPIQualtrics:
             print(f"Error: {response.status_code}")
             pp.pprint(response.content)
             return None       
+    
+    def getDateTimeColumns(self, df):
+        """
+        get the datetime columns from a dataframe
+        
+        returns a list of dictionaries with two keys, 'column' and 'timezone'
+        
+        The 2nd row of the webfile contains the timezone information
+        e.g. {"ImportId":"startDate","timeZone":"America/Chicago"}
+        """
+        
+        datetime_cols = []
+        # iterate over each column of the dataframe
+        for col in df.columns:
+            # check the second row for the json string contains timeZone
+            if 'timeZone' in df[col].iloc[1]:
+                # get the json string
+                json_str = df[col].iloc[1]
+                # convert to a dict
+                json_dict = json.loads(json_str)
+                # check if timeZone is in the dict
+                if 'timeZone' in json_dict.keys():
+                    # add to datetime_cols
+                    datetime_cols.append({'column': col, 'timezone': json_dict['timeZone']})
+                    pass
+            pass
+        pass
+        return datetime_cols
             
     def getContactLookupId(self, mailingListId, contactId):
         """
@@ -264,7 +296,9 @@ class LNPIQualtrics:
 
         for index in range(len(firstRow)):
             # remove \n from  description
-            description = firstRow[index].replace('\n',' ')
+            # description = firstRow[index].replace('\n',' ')
+            description = firstRow.iloc[index].replace('\n',' ')
+
             text += f"    {vars[index]}: {description}\n"
             pass
         return text
@@ -279,10 +313,21 @@ class LNPIQualtrics:
         
         # read in the file
         df = pd.read_csv(webfile)
+        # get the datetime columns
+        datetime_cols = self.getDateTimeColumns(df)
         # generate descriptions
         descriptions = self.generateDescriptions(df)
         # drop first two rows
         newdf = df.drop([0,1])
+        
+        # convert the datetime columns to timezone aware datetimes
+        for col in datetime_cols:
+            # get the timezone
+            timezone = col['timezone']
+            # convert the column to datetime with timezone
+            newdf[col['column']] = pd.to_datetime(newdf[col['column']], utc=True).dt.tz_convert(timezone)
+            # convert datetime column to an isoformat string
+            newdf[col['column']] = newdf[col['column']].apply(lambda x: x.isoformat() if pd.notnull(x) else None)
         # convert newdf to a json string
         json_str = newdf.to_json(orient="records")
         # convert to list
