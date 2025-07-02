@@ -28,10 +28,11 @@ import yaml
 pp = pprint.PrettyPrinter(indent=4)
 
 
-__version_info__ = ('0', '2', '5')
+__version_info__ = ('0', '2', '6')
 __version__ = '.'.join(__version_info__)
 version_history= \
 """
+0.2.6 - fixed bug in timezone conversion
 0.2.5 - when using a webfile, use the TimeZone to change the naive datetime to a timezone aware datetime
         this is found in the third row of the webfile. {"ImportId":"startDate","timeZone":"America/Chicago"}
         Changed description = firstRow[index].replace('\n',' ') to 
@@ -325,9 +326,13 @@ class LNPIQualtrics:
             # get the timezone
             timezone = col['timezone']
             # convert the column to datetime with timezone
-            newdf[col['column']] = pd.to_datetime(newdf[col['column']], utc=True).dt.tz_convert(timezone)
+            newdf[col['column']] = pd.to_datetime(newdf[col['column']])
+            # Localize to  timezone  such as 'America/Chicago'
+            # ambiguous=True to deal with conversion of DST on 2024-11-03
+            newdf[col['column']] = newdf[col['column']].dt.tz_localize(timezone, ambiguous=True)
             # convert datetime column to an isoformat string
             newdf[col['column']] = newdf[col['column']].apply(lambda x: x.isoformat() if pd.notnull(x) else None)
+            pass
         # convert newdf to a json string
         json_str = newdf.to_json(orient="records")
         # convert to list

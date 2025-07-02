@@ -218,7 +218,23 @@
                 "--webfile",
                 "../cda_cancerbatson/EMACancerBatson/CPOM_+ABatson_Survivorship+EMA+Survey+1_June+18,+2025_15.14.csv",
             ]
-        },        
+        },      
+        {
+            "name": "LNPIQualtrics.py r34",
+            "type": "python",
+            "request": "launch",
+            "program": "LNPIQualtrics.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":[
+                "--cmd",
+                "surveys",
+                "--index",
+                "6",
+                "--webfile",
+                "../cda_r34happiness/proj_stable2507/R34+EMA+spinal+cord+injury_July+2,+2025_06.22.csv",
+            ]
+        },            
         {
             "name": "impulsivity_process test gostop",
             "type": "python",
